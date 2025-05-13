@@ -8,7 +8,6 @@ import ModalBeltSelection from "./ModalBeltSelection";
 import { useGame } from "@/hooks/useGame";
 import { useKeyboardControls } from "@/hooks/useKeyboardControls";
 import BeltProgressBar from "./belt-progress-bar";
-import { Toaster } from "@/components/ui/toaster";
 
 // Game constants
 const CELL_SIZE = 20;
@@ -38,18 +37,13 @@ export default function GameContainer() {
 
   return (
     <div className="flex flex-col items-center gap-4">
-      <div className="w-full max-w-xl flex justify-between items-center">
-        <h1 className="text-2xl font-bold">BJJ Snake Game</h1>
-        <button
-          onClick={() => setIsColorModalOpen(true)}
-          className="px-3 py-1.5 rounded-lg bg-gray-100 hover:bg-gray-200 transition-colors flex items-center gap-2"
-        >
-          <div
-            className="w-4 h-4 rounded-full"
-            style={{ backgroundColor: BELTS[selectedBeltIndex].snakeColor }}
+      <div className="bg-gray-100 p-3 rounded-lg w-full max-w-xl">
+        <div className="flex flex-col gap-2">
+          <BeltProgressBar
+            currentBelt={currentBeltIndex}
+            currentDegree={gameState.beltProgress.degree}
           />
-          <span>{BELTS[selectedBeltIndex].name} Belt</span>
-        </button>
+        </div>
       </div>
 
       <GameBoard
@@ -73,30 +67,6 @@ export default function GameContainer() {
         }}
       />
 
-      <div className="bg-gray-100 p-3 rounded-lg w-full max-w-xl">
-        <div className="flex flex-col gap-2">
-          <div className="flex justify-between items-center">
-            <div>
-              <span className="font-bold">Current Belt: </span>
-              <span className="capitalize">
-                {gameState.beltProgress.rank} Belt
-              </span>
-              {gameState.beltProgress.degree > 0 && (
-                <span> ({gameState.beltProgress.degree} Degree)</span>
-              )}
-            </div>
-            <div>
-              <span className="font-bold">Score: </span>
-              <span>{gameState.score}</span>
-            </div>
-          </div>
-          <BeltProgressBar
-            currentBelt={currentBeltIndex}
-            currentDegree={gameState.beltProgress.degree}
-          />
-        </div>
-      </div>
-
       <ModalBeltSelection
         isOpen={isColorModalOpen}
         selectedBeltIndex={selectedBeltIndex}
@@ -113,7 +83,16 @@ export default function GameContainer() {
         }}
       />
 
-      <Toaster />
+      <button
+        onClick={() => setIsColorModalOpen(true)}
+        className="px-3 py-1.5 rounded-lg bg-gray-100 hover:bg-gray-200 transition-colors flex items-center gap-2"
+      >
+        <div
+          className="w-4 h-4 rounded-full"
+          style={{ backgroundColor: BELTS[selectedBeltIndex].snakeColor }}
+        />
+        <span>{BELTS[selectedBeltIndex].name} Belt</span>
+      </button>
 
       {gameState.isGameOver && (
         <div className="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center z-50">

@@ -11,6 +11,8 @@ import {
 import { cn } from "@/lib/utils";
 import { BELTS, SPECIAL_ITEMS } from "@/lib/game-constants";
 import { useBeltColors } from "@/hooks/use-belt-colors";
+import GameControls from "./game-controls";
+import { useViewportSize } from "@/hooks/useViewportSize";
 
 interface GameBoardProps {
   snake: Position[];
@@ -50,6 +52,7 @@ const GameBoard: React.FC<GameBoardProps> = ({
   isRunning,
   snakeColor,
 }) => {
+  const { isMobile } = useViewportSize();
   const {
     backgroundColor,
     gridColor,
@@ -58,16 +61,21 @@ const GameBoard: React.FC<GameBoardProps> = ({
     eyeColor,
   } = useBeltColors(beltProgress);
 
+  // 모바일에서 셀 크기 조정
+  const adjustedCellSize = isMobile ? Math.min(cellSize, 15) : cellSize;
+  const adjustedWidth = gridSize.width * adjustedCellSize;
+  const adjustedHeight = gridSize.height * adjustedCellSize;
+
   return (
-    <div className="flex flex-col gap-4">
+    <div className="flex flex-col gap-4 pb-32">
       <div
         className={cn(
           "game-board relative overflow-hidden rounded-2xl border-2 border-gray-300 shadow-xl bg-white",
           { "special-effect-glow": activeSpecialEffect }
         )}
         style={{
-          width: gridSize.width * cellSize,
-          height: gridSize.height * cellSize,
+          width: adjustedWidth,
+          height: adjustedHeight,
           backgroundColor: backgroundColor,
           position: "relative",
         }}
@@ -79,7 +87,7 @@ const GameBoard: React.FC<GameBoardProps> = ({
               key={`v-line-${i}`}
               style={{
                 position: "absolute",
-                left: i * cellSize,
+                left: i * adjustedCellSize,
                 top: 0,
                 width: "0.5px",
                 height: "100%",
@@ -93,7 +101,7 @@ const GameBoard: React.FC<GameBoardProps> = ({
               key={`h-line-${i}`}
               style={{
                 position: "absolute",
-                top: i * cellSize,
+                top: i * adjustedCellSize,
                 left: 0,
                 width: "100%",
                 height: "0.5px",
@@ -109,10 +117,10 @@ const GameBoard: React.FC<GameBoardProps> = ({
             key={`obstacle-${index}`}
             className="absolute bg-gray-600 rounded-sm z-10"
             style={{
-              width: cellSize,
-              height: cellSize,
-              left: obstacle.position.x * cellSize,
-              top: obstacle.position.y * cellSize,
+              width: adjustedCellSize,
+              height: adjustedCellSize,
+              left: obstacle.position.x * adjustedCellSize,
+              top: obstacle.position.y * adjustedCellSize,
             }}
           />
         ))}
@@ -122,10 +130,10 @@ const GameBoard: React.FC<GameBoardProps> = ({
           <div
             className="absolute bg-fuchsia-600 z-20 rounded-md"
             style={{
-              width: cellSize,
-              height: cellSize,
-              left: boss.position.x * cellSize,
-              top: boss.position.y * cellSize,
+              width: adjustedCellSize,
+              height: adjustedCellSize,
+              left: boss.position.x * adjustedCellSize,
+              top: boss.position.y * adjustedCellSize,
             }}
           >
             {/* Boss face */}
@@ -145,10 +153,10 @@ const GameBoard: React.FC<GameBoardProps> = ({
             key={`snake-${index}`}
             style={{
               position: "absolute",
-              width: cellSize,
-              height: cellSize,
-              left: segment.x * cellSize,
-              top: segment.y * cellSize,
+              width: adjustedCellSize,
+              height: adjustedCellSize,
+              left: segment.x * adjustedCellSize,
+              top: segment.y * adjustedCellSize,
               backgroundColor: index === 0 ? snakeHeadColor : snakeBodyColor,
               borderRadius: index === 0 ? "4px" : "2px",
               zIndex: 30,
@@ -175,10 +183,10 @@ const GameBoard: React.FC<GameBoardProps> = ({
           <div
             className="absolute bg-red-500 rounded-full z-20"
             style={{
-              width: cellSize * 0.7,
-              height: cellSize * 0.7,
-              left: food.x * cellSize + cellSize * 0.15,
-              top: food.y * cellSize + cellSize * 0.15,
+              width: adjustedCellSize * 0.7,
+              height: adjustedCellSize * 0.7,
+              left: food.x * adjustedCellSize + adjustedCellSize * 0.15,
+              top: food.y * adjustedCellSize + adjustedCellSize * 0.15,
             }}
           />
         )}
@@ -188,10 +196,14 @@ const GameBoard: React.FC<GameBoardProps> = ({
           <div
             className="absolute bg-cyan-400 rounded-full z-20 animate-pulse"
             style={{
-              width: cellSize * 0.8,
-              height: cellSize * 0.8,
-              left: specialFood.position.x * cellSize + cellSize * 0.1,
-              top: specialFood.position.y * cellSize + cellSize * 0.1,
+              width: adjustedCellSize * 0.8,
+              height: adjustedCellSize * 0.8,
+              left:
+                specialFood.position.x * adjustedCellSize +
+                adjustedCellSize * 0.1,
+              top:
+                specialFood.position.y * adjustedCellSize +
+                adjustedCellSize * 0.1,
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
@@ -240,10 +252,10 @@ const GameBoard: React.FC<GameBoardProps> = ({
       </div>
 
       {/* Game control buttons */}
-      <div className="flex gap-3">
+      <div className="flex flex-col gap-3">
         <button
           className={cn(
-            "px-6 py-2 rounded-xl text-white font-semibold shadow transition",
+            "px-6 py-3 rounded-xl text-white font-semibold shadow-lg transition",
             isRunning
               ? "bg-red-500 hover:bg-red-600"
               : "bg-blue-600 hover:bg-blue-700"
@@ -253,9 +265,19 @@ const GameBoard: React.FC<GameBoardProps> = ({
           {isRunning ? "Stop" : "Start"}
         </button>
 
-        <div className="flex items-center gap-2 px-4 py-2 bg-gray-100 rounded-full text-sm shadow">
+        <div className="flex items-center justify-center gap-2 px-4 py-3 bg-gray-100 rounded-xl text-sm shadow-lg">
           <span className="text-lg">⬅️⬆️⬇️➡️</span>
-          <span>Use arrow keys to move the snake!</span>
+          <span className={cn(isMobile ? "hidden" : "block")}>
+            Use arrow keys to move the snake!
+          </span>
+          <span className={cn(isMobile ? "block" : "hidden")}>
+            Use the buttons below to move the snake!
+          </span>
+        </div>
+
+        {/* 모바일 컨트롤 - 모바일에서만 표시 */}
+        <div className="md:hidden">
+          <GameControls />
         </div>
       </div>
     </div>
