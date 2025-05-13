@@ -1,20 +1,59 @@
+"use client";
+
+import { useEffect, useRef } from "react";
 import { BELTS } from "@/lib/game-constants";
-import { BeltRank } from "@/types/game";
+import { BeltProgressBarProps } from "@/types/game";
+import { toast } from "sonner";
 
 /**
  * 벨트 프로그레스 바 컴포넌트
  * 현재 벨트 등급과 단계를 시각적으로 표시합니다.
  * 다음 벨트까지의 진행 상황을 보여줍니다.
  */
-interface BeltProgressBarProps {
-  currentBelt: number;
-  currentDegree: number;
-}
-
 export default function BeltProgressBar({
   currentBelt,
   currentDegree,
 }: BeltProgressBarProps) {
+  const prevBeltRef = useRef(currentBelt);
+  const prevDegreeRef = useRef(currentDegree);
+
+  useEffect(() => {
+    // 벨트 변경 감지 (승급)
+    if (prevBeltRef.current !== currentBelt) {
+      toast.success(
+        `Congratulations! You've been promoted to ${BELTS[
+          currentBelt
+        ].name.toUpperCase()} Belt! 🎉`,
+        {
+          duration: 3000,
+          position: "top-center",
+          style: {
+            background: "linear-gradient(to right, #fbbf24, #fcd34d, #fbbf24)",
+            color: "#000",
+            fontWeight: "bold",
+            fontSize: "1.1rem",
+          },
+        }
+      );
+    }
+    // Degree 변경 감지 (단계 상승)
+    else if (prevDegreeRef.current < currentDegree) {
+      toast.success(`Advanced to ${currentDegree} Degree!`, {
+        duration: 2000,
+        position: "top-center",
+        style: {
+          background: "#4ade80",
+          color: "#fff",
+          fontWeight: "medium",
+          fontSize: "1rem",
+        },
+      });
+    }
+
+    prevBeltRef.current = currentBelt;
+    prevDegreeRef.current = currentDegree;
+  }, [currentBelt, currentDegree]);
+
   return (
     <div className="w-full mb-4">
       {/* 현재 벨트와 다음 벨트 표시 */}

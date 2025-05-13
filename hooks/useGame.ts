@@ -9,6 +9,7 @@ import {
 } from "@/types/game";
 import { BELTS, SPECIAL_ITEMS } from "@/lib/game-constants";
 import { calculateBeltProgress } from "@/lib/score-calculator";
+import { toast } from "sonner";
 
 // Game constants
 const CELL_SIZE = 20;
@@ -43,6 +44,7 @@ export const useGame = (selectedBeltIndex: number) => {
   const [combo, setCombo] = useState(0);
   const [isRunning, setIsRunning] = useState(false);
   const [lastMoveTime, setLastMoveTime] = useState(0);
+  const [promotionMessage, setPromotionMessage] = useState<string | null>(null);
 
   const gameStateRef = useRef(gameState);
   const comboRef = useRef(combo);
@@ -330,6 +332,20 @@ export const useGame = (selectedBeltIndex: number) => {
 
       if (rank !== prev.beltProgress.rank) {
         generateObstacles();
+        toast.success(
+          `Congratulations! You've been promoted to ${rank.toUpperCase()} Belt! 🎉`,
+          {
+            duration: 3000,
+            position: "top-center",
+            style: {
+              background:
+                "linear-gradient(to right, #fbbf24, #fcd34d, #fbbf24)",
+              color: "#000",
+              fontWeight: "bold",
+              fontSize: "1.1rem",
+            },
+          }
+        );
       }
 
       return {
@@ -456,5 +472,6 @@ export const useGame = (selectedBeltIndex: number) => {
     handleGameOver,
     directionRef,
     nextDirectionRef,
+    promotionMessage,
   };
 };

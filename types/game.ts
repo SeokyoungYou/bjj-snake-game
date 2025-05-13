@@ -50,10 +50,6 @@ export interface GameOverModalProps {
 
 export type BeltType = "white" | "blue" | "purple" | "brown" | "black";
 
-export interface PromotionModalProps {
-  message: string;
-}
-
 export interface BeltProgressBarProps {
   currentBelt: number;
   currentDegree: number;

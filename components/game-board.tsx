@@ -62,7 +62,7 @@ const GameBoard: React.FC<GameBoardProps> = ({
     <div className="flex flex-col gap-4">
       <div
         className={cn(
-          "game-board relative overflow-hidden rounded-lg border-4 border-gray-700",
+          "game-board relative overflow-hidden rounded-2xl border-2 border-gray-300 shadow-xl bg-white",
           { "special-effect-glow": activeSpecialEffect }
         )}
         style={{
@@ -220,16 +220,18 @@ const GameBoard: React.FC<GameBoardProps> = ({
         )}
 
         {/* Score and combo display */}
-        <div className="absolute top-2 right-2 z-50">
-          <div className="bg-black bg-opacity-50 px-2 py-1 rounded">
-            <span className="text-white font-bold text-sm">Score: {score}</span>
+        <div className="absolute top-3 right-3 z-50">
+          <div className="backdrop-blur bg-black/40 px-3 py-1 rounded-xl shadow">
+            <span className="text-white font-bold text-base">
+              Score: {score}
+            </span>
           </div>
         </div>
 
         {combo > 1 && (
-          <div className="absolute top-2 left-2 z-50">
-            <div className="bg-yellow-500 bg-opacity-80 px-2 py-1 rounded">
-              <span className="text-white font-bold text-sm">
+          <div className="absolute top-3 left-3 z-50">
+            <div className="backdrop-blur bg-yellow-400/80 px-3 py-1 rounded-xl shadow">
+              <span className="text-white font-bold text-base">
                 Combo: {combo}x
               </span>
             </div>
@@ -238,21 +240,22 @@ const GameBoard: React.FC<GameBoardProps> = ({
       </div>
 
       {/* Game control buttons */}
-      <div className="flex gap-2">
+      <div className="flex gap-3">
         <button
           className={cn(
-            "px-4 py-2 rounded text-white font-medium",
+            "px-6 py-2 rounded-xl text-white font-semibold shadow transition",
             isRunning
               ? "bg-red-500 hover:bg-red-600"
-              : "bg-blue-500 hover:bg-blue-600"
+              : "bg-blue-600 hover:bg-blue-700"
           )}
           onClick={isRunning ? onGameStop : onGameStart}
         >
-          {isRunning ? "Stop Game" : "Start Game"}
+          {isRunning ? "Stop" : "Start"}
         </button>
 
-        <div className="px-3 py-2 bg-gray-100 rounded text-sm">
-          <span>Controls: Use arrow keys to move the snake!</span>
+        <div className="flex items-center gap-2 px-4 py-2 bg-gray-100 rounded-full text-sm shadow">
+          <span className="text-lg">⬅️⬆️⬇️➡️</span>
+          <span>Use arrow keys to move the snake!</span>
         </div>
       </div>
     </div>

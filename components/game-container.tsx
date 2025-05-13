@@ -8,6 +8,7 @@ import ModalBeltSelection from "./ModalBeltSelection";
 import { useGame } from "@/hooks/useGame";
 import { useKeyboardControls } from "@/hooks/useKeyboardControls";
 import BeltProgressBar from "./belt-progress-bar";
+import { Toaster } from "@/components/ui/toaster";
 
 // Game constants
 const CELL_SIZE = 20;
@@ -111,6 +112,8 @@ export default function GameContainer() {
           setIsColorModalOpen(false);
         }}
       />
+
+      <Toaster />
 
       {gameState.isGameOver && (
         <div className="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center z-50">
