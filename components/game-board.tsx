@@ -205,7 +205,7 @@ const GameBoard: React.FC<GameBoardProps> = ({
               "px-6 py-3 rounded-xl text-white font-semibold shadow-lg transition",
               isRunning
                 ? "bg-red-500 hover:bg-red-600"
-                : "bg-blue-600 hover:bg-blue-700"
+                : "bg-indigo-600 hover:bg-indigo-700"
             )}
             onClick={isRunning ? onGameStop : handleGameStart}
           >

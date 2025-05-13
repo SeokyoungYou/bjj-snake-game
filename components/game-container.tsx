@@ -10,6 +10,7 @@ import { useKeyboardControls } from "@/hooks/useKeyboardControls";
 import BeltProgressBar from "./belt-progress-bar";
 import { cn } from "@/lib/utils";
 import { useViewportSize } from "@/hooks/useViewportSize";
+import ModalGameOver from "./ModalGameOver";
 
 export default function GameContainer() {
   const [selectedBeltIndex, setSelectedBeltIndex] = useState(0);
@@ -94,26 +95,14 @@ export default function GameContainer() {
       </button>
 
       {gameState.isGameOver && (
-        <div className="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center z-50">
-          <div className="bg-white p-6 rounded-lg text-center">
-            <h2 className="text-2xl font-bold mb-4">Game Over!</h2>
-            <p className="mb-2">
-              Final Score: <span className="font-bold">{gameState.score}</span>
-            </p>
-            <p className="mb-4">
-              Final Belt:{" "}
-              <span className="font-bold capitalize">
-                {gameState.beltProgress.rank} Belt
-              </span>
-            </p>
-            <button
-              className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
-              onClick={startGame}
-            >
-              Play Again
-            </button>
-          </div>
-        </div>
+        <ModalGameOver
+          score={gameState.score}
+          beltRank={gameState.beltProgress.rank}
+          onPlayAgain={startGame}
+          snakeHeadColor={BELTS[selectedBeltIndex].color}
+          snakeBodyColor={BELTS[selectedBeltIndex].snakeColor}
+          eyeColor={BELTS[selectedBeltIndex].eyeColor}
+        />
       )}
     </div>
   );
