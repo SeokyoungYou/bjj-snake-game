@@ -19,6 +19,7 @@ import Snake from "./objects/Snake";
 import Food from "./objects/Food";
 import SpecialFood from "./objects/SpecialFood";
 import SpecialEffect from "./objects/SpecialEffect";
+import BeltProgressBar from "./belt-progress-bar";
 
 interface GameBoardProps {
   snake: Position[];
@@ -37,6 +38,8 @@ interface GameBoardProps {
     snake: string;
     background: string;
   };
+  currentBeltIndex: number;
+  currentDegree: number;
 }
 
 const GameBoard: React.FC<GameBoardProps> = ({
@@ -53,6 +56,8 @@ const GameBoard: React.FC<GameBoardProps> = ({
   onGameStop,
   isRunning,
   snakeColor,
+  currentBeltIndex,
+  currentDegree,
 }) => {
   const { cellSize, gridSize, isMobile } = useGridSize();
   const gameBoardRef = React.useRef<HTMLDivElement>(null);
@@ -70,7 +75,7 @@ const GameBoard: React.FC<GameBoardProps> = ({
 
   const scrollToGameBoard = () => {
     window.scrollTo({
-      top: (gameBoardRef.current?.offsetTop ?? 0) - 30,
+      top: (gameBoardRef.current?.offsetTop ?? 0) - 10,
       behavior: "smooth",
     });
   };
@@ -186,28 +191,27 @@ const GameBoard: React.FC<GameBoardProps> = ({
       </div>
 
       {/* Game control buttons */}
-      <div className="flex flex-col gap-3">
-        <button
-          className={cn(
-            "px-6 py-3 rounded-xl text-white font-semibold shadow-lg transition",
-            isRunning
-              ? "bg-red-500 hover:bg-red-600"
-              : "bg-blue-600 hover:bg-blue-700"
-          )}
-          onClick={isRunning ? onGameStop : handleGameStart}
-        >
-          {isRunning ? "Stop" : "Start"}
-        </button>
-
-        <div className="flex items-center justify-center gap-2 px-4 py-3 bg-gray-100 rounded-xl text-sm shadow-lg">
-          <span className="text-lg">⬅️⬆️⬇️➡️</span>
-          <span className={cn(isMobile ? "hidden" : "block")}>
-            Use arrow keys to move the snake!
-          </span>
-          <span className={cn(isMobile ? "block" : "hidden")}>
-            Use the buttons below to move the snake!
-          </span>
-        </div>
+      <div className="flex flex-col gap-3 w-full">
+        {isRunning ? (
+          <div className=" w-full max-w-xl">
+            <BeltProgressBar
+              currentBelt={currentBeltIndex}
+              currentDegree={currentDegree}
+            />
+          </div>
+        ) : (
+          <button
+            className={cn(
+              "px-6 py-3 rounded-xl text-white font-semibold shadow-lg transition",
+              isRunning
+                ? "bg-red-500 hover:bg-red-600"
+                : "bg-blue-600 hover:bg-blue-700"
+            )}
+            onClick={isRunning ? onGameStop : handleGameStart}
+          >
+            {isRunning ? "Stop" : "Start"}
+          </button>
+        )}
 
         {/* 모바일 컨트롤 - 게임 실행 중일 때만 표시 */}
         {isRunning && (

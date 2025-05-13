@@ -8,13 +8,12 @@ import ModalBeltSelection from "./ModalBeltSelection";
 import { useGame } from "@/hooks/useGame";
 import { useKeyboardControls } from "@/hooks/useKeyboardControls";
 import BeltProgressBar from "./belt-progress-bar";
-import { useGridSize } from "@/hooks/useGridSize";
+import { cn } from "@/lib/utils";
+import { useViewportSize } from "@/hooks/useViewportSize";
 
 export default function GameContainer() {
   const [selectedBeltIndex, setSelectedBeltIndex] = useState(0);
   const [isColorModalOpen, setIsColorModalOpen] = useState(false);
-
-  const { cellSize, gridSize } = useGridSize();
 
   const {
     gameState,
@@ -28,20 +27,22 @@ export default function GameContainer() {
   } = useGame(selectedBeltIndex);
 
   useKeyboardControls(directionRef, nextDirectionRef);
+  const { isMobile } = useViewportSize();
 
   const currentBeltIndex = BELTS.findIndex(
     (belt) => belt.rank === gameState.beltProgress.rank
   );
 
   return (
-    <div className="flex flex-col items-center gap-4">
-      <div className="bg-gray-100 p-3 rounded-lg w-full max-w-xl">
-        <div className="flex flex-col gap-2">
-          <BeltProgressBar
-            currentBelt={currentBeltIndex}
-            currentDegree={gameState.beltProgress.degree}
-          />
-        </div>
+    <div className="flex flex-col items-center gap-6">
+      <div className="flex items-center justify-center gap-2 px-4 py-3 bg-gray-100 rounded-xl text-sm shadow-lg">
+        <span className="text-lg">⬅️⬆️⬇️➡️</span>
+        <span className={cn(isMobile ? "hidden" : "block")}>
+          Use arrow keys to move the snake!
+        </span>
+        <span className={cn(isMobile ? "block" : "hidden")}>
+          Use the buttons below to move the snake!
+        </span>
       </div>
 
       <GameBoard
@@ -50,8 +51,6 @@ export default function GameContainer() {
         specialFood={gameState.specialFood}
         obstacles={gameState.obstacles}
         boss={null}
-        gridSize={gridSize}
-        cellSize={cellSize}
         beltProgress={gameState.beltProgress}
         activeSpecialEffect={gameState.activeSpecialEffect}
         score={gameState.score}
@@ -63,6 +62,8 @@ export default function GameContainer() {
           snake: BELTS[selectedBeltIndex].snakeColor,
           background: BELTS[selectedBeltIndex].bgColor,
         }}
+        currentBeltIndex={currentBeltIndex}
+        currentDegree={gameState.beltProgress.degree}
       />
 
       <ModalBeltSelection
