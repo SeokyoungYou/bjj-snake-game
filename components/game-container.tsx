@@ -8,15 +8,13 @@ import ModalBeltSelection from "./ModalBeltSelection";
 import { useGame } from "@/hooks/useGame";
 import { useKeyboardControls } from "@/hooks/useKeyboardControls";
 import BeltProgressBar from "./belt-progress-bar";
-
-// Game constants
-const CELL_SIZE = 20;
-const GRID_WIDTH = 30;
-const GRID_HEIGHT = 20;
+import { useGridSize } from "@/hooks/useGridSize";
 
 export default function GameContainer() {
   const [selectedBeltIndex, setSelectedBeltIndex] = useState(0);
   const [isColorModalOpen, setIsColorModalOpen] = useState(false);
+
+  const { cellSize, gridSize } = useGridSize();
 
   const {
     gameState,
@@ -52,8 +50,8 @@ export default function GameContainer() {
         specialFood={gameState.specialFood}
         obstacles={gameState.obstacles}
         boss={null}
-        gridSize={{ width: GRID_WIDTH, height: GRID_HEIGHT }}
-        cellSize={CELL_SIZE}
+        gridSize={gridSize}
+        cellSize={cellSize}
         beltProgress={gameState.beltProgress}
         activeSpecialEffect={gameState.activeSpecialEffect}
         score={gameState.score}

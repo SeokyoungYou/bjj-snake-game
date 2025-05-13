@@ -10,21 +10,32 @@ import {
 import { BELTS, SPECIAL_ITEMS } from "@/lib/game-constants";
 import { calculateBeltProgress } from "@/lib/score-calculator";
 import { toast } from "sonner";
+import { useGridSize } from "./useGridSize";
 
 // Game constants
 const CELL_SIZE = 20;
-const GRID_WIDTH = 30;
-const GRID_HEIGHT = 20;
 const INITIAL_SPEED = 150;
 const SPEED_INCREASE_PER_BELT = 20;
 
-const getInitialGameState = (selectedBeltIndex: number): GameState => ({
+const getInitialGameState = (
+  selectedBeltIndex: number,
+  gridSize: { width: number; height: number }
+): GameState => ({
   snake: [
-    { x: 10, y: 10 },
-    { x: 9, y: 10 },
-    { x: 8, y: 10 },
+    { x: Math.floor(gridSize.width / 2), y: Math.floor(gridSize.height / 2) },
+    {
+      x: Math.floor(gridSize.width / 2) - 1,
+      y: Math.floor(gridSize.height / 2),
+    },
+    {
+      x: Math.floor(gridSize.width / 2) - 2,
+      y: Math.floor(gridSize.height / 2),
+    },
   ],
-  food: { x: 15, y: 10 },
+  food: {
+    x: Math.floor(gridSize.width / 2) + 5,
+    y: Math.floor(gridSize.height / 2),
+  },
   specialFood: null,
   obstacles: [],
   direction: "RIGHT",
@@ -38,8 +49,9 @@ const getInitialGameState = (selectedBeltIndex: number): GameState => ({
 });
 
 export const useGame = (selectedBeltIndex: number) => {
+  const { gridSize } = useGridSize();
   const [gameState, setGameState] = useState<GameState>(
-    getInitialGameState(selectedBeltIndex)
+    getInitialGameState(selectedBeltIndex, gridSize)
   );
   const [combo, setCombo] = useState(0);
   const [isRunning, setIsRunning] = useState(false);
@@ -69,7 +81,7 @@ export const useGame = (selectedBeltIndex: number) => {
     if (isRunningRef.current) return;
 
     stopGame();
-    setGameState(getInitialGameState(selectedBeltIndex));
+    setGameState(getInitialGameState(selectedBeltIndex, gridSize));
     directionRef.current = "RIGHT";
     nextDirectionRef.current = "RIGHT";
     generateObstacles();
@@ -199,9 +211,9 @@ export const useGame = (selectedBeltIndex: number) => {
 
     if (
       head.x < 0 ||
-      head.x >= GRID_WIDTH ||
+      head.x >= gridSize.width ||
       head.y < 0 ||
-      head.y >= GRID_HEIGHT
+      head.y >= gridSize.height
     ) {
       return true;
     }
@@ -233,8 +245,8 @@ export const useGame = (selectedBeltIndex: number) => {
 
     while (!validPosition) {
       newFood = {
-        x: Math.floor(Math.random() * GRID_WIDTH),
-        y: Math.floor(Math.random() * GRID_HEIGHT),
+        x: Math.floor(Math.random() * gridSize.width),
+        y: Math.floor(Math.random() * gridSize.height),
       };
 
       validPosition = true;
@@ -279,8 +291,8 @@ export const useGame = (selectedBeltIndex: number) => {
 
     while (!validPosition) {
       const position = {
-        x: Math.floor(Math.random() * GRID_WIDTH),
-        y: Math.floor(Math.random() * GRID_HEIGHT),
+        x: Math.floor(Math.random() * gridSize.width),
+        y: Math.floor(Math.random() * gridSize.height),
       };
 
       const type =
@@ -362,8 +374,16 @@ export const useGame = (selectedBeltIndex: number) => {
     const newObstacles: ObstaclePosition[] = [];
     const safetyZone = [];
 
-    for (let x = 5; x < 15; x++) {
-      for (let y = 8; y < 13; y++) {
+    for (
+      let x = Math.floor(gridSize.width / 6);
+      x < Math.floor(gridSize.width / 2);
+      x++
+    ) {
+      for (
+        let y = Math.floor(gridSize.height / 3);
+        y < Math.floor((gridSize.height * 2) / 3);
+        y++
+      ) {
         safetyZone.push({ x, y });
       }
     }
@@ -377,8 +397,8 @@ export const useGame = (selectedBeltIndex: number) => {
       while (!validPosition && attempts < maxAttempts) {
         attempts++;
         const position = {
-          x: Math.floor(Math.random() * GRID_WIDTH),
-          y: Math.floor(Math.random() * GRID_HEIGHT),
+          x: Math.floor(Math.random() * gridSize.width),
+          y: Math.floor(Math.random() * gridSize.height),
         };
 
         obstacle = { position, type: "wall" };
@@ -434,8 +454,8 @@ export const useGame = (selectedBeltIndex: number) => {
     const { snake, obstacles } = gameStateRef.current;
     const safeSpots: Position[] = [];
 
-    for (let x = 0; x < GRID_WIDTH; x++) {
-      for (let y = 0; y < GRID_HEIGHT; y++) {
+    for (let x = 0; x < gridSize.width; x++) {
+      for (let y = 0; y < gridSize.height; y++) {
         let isSafe = true;
 
         for (let i = 0; i < snake.length; i++) {

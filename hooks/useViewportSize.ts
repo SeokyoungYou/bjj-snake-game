@@ -1,5 +1,4 @@
-import { useWindowSize } from "react-use";
-
+import { useWindowSize } from "usehooks-ts";
 interface ViewportSize {
   width: number;
   height: number;

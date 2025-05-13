@@ -9,10 +9,16 @@ import {
   ObstaclePosition,
 } from "@/types/game";
 import { cn } from "@/lib/utils";
-import { BELTS, SPECIAL_ITEMS } from "@/lib/game-constants";
 import { useBeltColors } from "@/hooks/use-belt-colors";
 import GameControls from "./game-controls";
 import { useViewportSize } from "@/hooks/useViewportSize";
+import { useGridSize } from "@/hooks/useGridSize";
+import Obstacle from "./objects/Obstacle";
+import Boss from "./objects/Boss";
+import Snake from "./objects/Snake";
+import Food from "./objects/Food";
+import SpecialFood from "./objects/SpecialFood";
+import SpecialEffect from "./objects/SpecialEffect";
 
 interface GameBoardProps {
   snake: Position[];
@@ -20,8 +26,6 @@ interface GameBoardProps {
   specialFood: SpecialItem | null;
   obstacles: ObstaclePosition[];
   boss: any | null;
-  gridSize: { width: number; height: number };
-  cellSize: number;
   beltProgress: BeltProgress;
   activeSpecialEffect: string | null;
   score: number;
@@ -41,8 +45,6 @@ const GameBoard: React.FC<GameBoardProps> = ({
   specialFood,
   obstacles,
   boss,
-  gridSize,
-  cellSize,
   beltProgress,
   activeSpecialEffect,
   score,
@@ -52,7 +54,8 @@ const GameBoard: React.FC<GameBoardProps> = ({
   isRunning,
   snakeColor,
 }) => {
-  const { isMobile } = useViewportSize();
+  const { cellSize, gridSize, isMobile } = useGridSize();
+  const gameBoardRef = React.useRef<HTMLDivElement>(null);
   const {
     backgroundColor,
     gridColor,
@@ -61,14 +64,31 @@ const GameBoard: React.FC<GameBoardProps> = ({
     eyeColor,
   } = useBeltColors(beltProgress);
 
-  // 모바일에서 셀 크기 조정
-  const adjustedCellSize = isMobile ? Math.min(cellSize, 15) : cellSize;
-  const adjustedWidth = gridSize.width * adjustedCellSize;
-  const adjustedHeight = gridSize.height * adjustedCellSize;
+  const adjustedCellSize = cellSize;
+  const adjustedWidth = gridSize.width * cellSize;
+  const adjustedHeight = gridSize.height * cellSize;
+
+  const scrollToGameBoard = () => {
+    window.scrollTo({
+      top: (gameBoardRef.current?.offsetTop ?? 0) - 30,
+      behavior: "smooth",
+    });
+  };
+
+  const handleGameStart = () => {
+    onGameStart();
+    scrollToGameBoard();
+  };
+
+  const handlePlayAgain = () => {
+    onGameStart();
+    scrollToGameBoard();
+  };
 
   return (
-    <div className="flex flex-col gap-4 pb-32">
+    <div className="flex flex-col gap-4 pb-32 justify-center items-center">
       <div
+        ref={gameBoardRef}
         className={cn(
           "game-board relative overflow-hidden rounded-2xl border-2 border-gray-300 shadow-xl bg-white",
           { "special-effect-glow": activeSpecialEffect }
@@ -111,124 +131,38 @@ const GameBoard: React.FC<GameBoardProps> = ({
           ))}
         </div>
 
-        {/* Obstacles rendering */}
+        {/* Obstacles */}
         {obstacles.map((obstacle, index) => (
-          <div
+          <Obstacle
             key={`obstacle-${index}`}
-            className="absolute bg-gray-600 rounded-sm z-10"
-            style={{
-              width: adjustedCellSize,
-              height: adjustedCellSize,
-              left: obstacle.position.x * adjustedCellSize,
-              top: obstacle.position.y * adjustedCellSize,
-            }}
+            obstacle={obstacle}
+            cellSize={adjustedCellSize}
           />
         ))}
 
-        {/* Boss rendering */}
-        {boss && (
-          <div
-            className="absolute bg-fuchsia-600 z-20 rounded-md"
-            style={{
-              width: adjustedCellSize,
-              height: adjustedCellSize,
-              left: boss.position.x * adjustedCellSize,
-              top: boss.position.y * adjustedCellSize,
-            }}
-          >
-            {/* Boss face */}
-            <div className="flex flex-col items-center justify-center h-full w-full">
-              <div className="flex gap-1 mt-1">
-                <div className="w-1 h-1 bg-black rounded-full" />
-                <div className="w-1 h-1 bg-black rounded-full" />
-              </div>
-              <div className="w-3 h-1 bg-black rounded-full mt-2" />
-            </div>
-          </div>
-        )}
+        {/* Boss */}
+        {boss && <Boss boss={boss} cellSize={adjustedCellSize} />}
 
-        {/* Snake rendering */}
-        {snake.map((segment, index) => (
-          <div
-            key={`snake-${index}`}
-            style={{
-              position: "absolute",
-              width: adjustedCellSize,
-              height: adjustedCellSize,
-              left: segment.x * adjustedCellSize,
-              top: segment.y * adjustedCellSize,
-              backgroundColor: index === 0 ? snakeHeadColor : snakeBodyColor,
-              borderRadius: index === 0 ? "4px" : "2px",
-              zIndex: 30,
-            }}
-          >
-            {/* Eyes for snake head */}
-            {index === 0 && (
-              <div className="w-full h-full relative">
-                <div
-                  className="absolute top-1 left-1 w-1.5 h-1.5 rounded-full"
-                  style={{ backgroundColor: eyeColor }}
-                />
-                <div
-                  className="absolute top-1 right-1 w-1.5 h-1.5 rounded-full"
-                  style={{ backgroundColor: eyeColor }}
-                />
-              </div>
-            )}
-          </div>
-        ))}
+        {/* Snake */}
+        <Snake
+          snake={snake}
+          cellSize={adjustedCellSize}
+          snakeHeadColor={snakeHeadColor}
+          snakeBodyColor={snakeBodyColor}
+          eyeColor={eyeColor}
+        />
 
-        {/* Food rendering */}
-        {food && (
-          <div
-            className="absolute bg-red-500 rounded-full z-20"
-            style={{
-              width: adjustedCellSize * 0.7,
-              height: adjustedCellSize * 0.7,
-              left: food.x * adjustedCellSize + adjustedCellSize * 0.15,
-              top: food.y * adjustedCellSize + adjustedCellSize * 0.15,
-            }}
-          />
-        )}
+        {/* Food */}
+        {food && <Food food={food} cellSize={adjustedCellSize} />}
 
-        {/* Special food rendering */}
+        {/* Special food */}
         {specialFood && (
-          <div
-            className="absolute bg-cyan-400 rounded-full z-20 animate-pulse"
-            style={{
-              width: adjustedCellSize * 0.8,
-              height: adjustedCellSize * 0.8,
-              left:
-                specialFood.position.x * adjustedCellSize +
-                adjustedCellSize * 0.1,
-              top:
-                specialFood.position.y * adjustedCellSize +
-                adjustedCellSize * 0.1,
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-            }}
-          >
-            <span className="text-xs font-bold text-black">
-              {specialFood.type.charAt(0)}
-            </span>
-          </div>
+          <SpecialFood specialFood={specialFood} cellSize={adjustedCellSize} />
         )}
 
-        {/* Special effect indicator */}
+        {/* Special effect */}
         {activeSpecialEffect && (
-          <div
-            className="absolute inset-0 border-4 border-cyan-400 z-40 pointer-events-none"
-            style={{
-              boxShadow: "0 0 10px 2px rgba(0, 255, 255, 0.5) inset",
-            }}
-          >
-            <div className="absolute top-2 left-1/2 transform -translate-x-1/2 bg-black bg-opacity-50 px-3 py-1 rounded-full">
-              <span className="text-cyan-400 font-bold">
-                {activeSpecialEffect}
-              </span>
-            </div>
-          </div>
+          <SpecialEffect activeSpecialEffect={activeSpecialEffect} />
         )}
 
         {/* Score and combo display */}
@@ -260,7 +194,7 @@ const GameBoard: React.FC<GameBoardProps> = ({
               ? "bg-red-500 hover:bg-red-600"
               : "bg-blue-600 hover:bg-blue-700"
           )}
-          onClick={isRunning ? onGameStop : onGameStart}
+          onClick={isRunning ? onGameStop : handleGameStart}
         >
           {isRunning ? "Stop" : "Start"}
         </button>
@@ -275,10 +209,12 @@ const GameBoard: React.FC<GameBoardProps> = ({
           </span>
         </div>
 
-        {/* 모바일 컨트롤 - 모바일에서만 표시 */}
-        <div className="md:hidden">
-          <GameControls />
-        </div>
+        {/* 모바일 컨트롤 - 게임 실행 중일 때만 표시 */}
+        {isRunning && (
+          <div className="md:hidden">
+            <GameControls onPlayAgain={handleGameStart} />
+          </div>
+        )}
       </div>
     </div>
   );

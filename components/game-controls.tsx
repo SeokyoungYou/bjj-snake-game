@@ -10,17 +10,15 @@ import {
 import { cn } from "@/lib/utils";
 import { useViewportSize } from "@/hooks/useViewportSize";
 
-/**
- * 게임 컨트롤 컴포넌트
- * 방향키 버튼을 제공하여 모바일 환경에서도 게임을 조작할 수 있게 합니다.
- */
-export default function GameControls() {
+interface GameControlsProps {
+  onPlayAgain?: () => void;
+}
+
+export default function GameControls({ onPlayAgain }: GameControlsProps) {
   const { isMobile } = useViewportSize();
 
-  /**
-   * 버튼 클릭/터치 시 키보드 이벤트를 시뮬레이션합니다.
-   * @param direction - 방향키 값 ('ArrowUp' | 'ArrowDown' | 'ArrowLeft' | 'ArrowRight')
-   */
+  if (!isMobile) return null;
+
   const handleButtonPress = (
     direction: "ArrowUp" | "ArrowDown" | "ArrowLeft" | "ArrowRight"
   ) => {
@@ -29,78 +27,54 @@ export default function GameControls() {
   };
 
   return (
-    <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50">
-      <div className="grid grid-cols-3 gap-3 w-[280px]">
-        {/* 상단 방향키 */}
-        <div className="col-start-2">
+    <div className="fixed bottom-2 left-1/2 -translate-x-1/2 z-50 w-full flex justify-center pointer-events-none">
+      <div
+        className={cn(
+          "bg-white/80 rounded-xl shadow-xl px-2 py-2 flex flex-col gap-2 pointer-events-auto",
+          "backdrop-blur-md max-w-xs"
+        )}
+      >
+        <div className="flex justify-center gap-2">
           <Button
+            aria-label="Move Up"
             variant="outline"
-            className={cn(
-              "w-full aspect-square bg-white/90 backdrop-blur-md hover:bg-white active:bg-white/100",
-              "touch-manipulation select-none shadow-lg",
-              isMobile ? "h-16" : "h-14"
-            )}
+            className="w-12 h-12 rounded-lg bg-white/90 shadow active:bg-blue-100 transition"
             onTouchStart={() => handleButtonPress("ArrowUp")}
             onClick={() => handleButtonPress("ArrowUp")}
           >
-            <ChevronUp
-              className={cn("h-8 w-8", isMobile ? "h-10 w-10" : "h-8 w-8")}
-            />
+            <ChevronUp className="w-7 h-7" />
           </Button>
         </div>
-        {/* 좌측 방향키 */}
-        <div className="col-start-1 row-start-2">
+        <div className="flex justify-between gap-2">
           <Button
+            aria-label="Move Left"
             variant="outline"
-            className={cn(
-              "w-full aspect-square bg-white/90 backdrop-blur-md hover:bg-white active:bg-white/100",
-              "touch-manipulation select-none shadow-lg",
-              isMobile ? "h-16" : "h-14"
-            )}
+            className="w-12 h-12 rounded-lg bg-white/90 shadow active:bg-blue-100 transition"
             onTouchStart={() => handleButtonPress("ArrowLeft")}
             onClick={() => handleButtonPress("ArrowLeft")}
           >
-            <ChevronLeft
-              className={cn("h-8 w-8", isMobile ? "h-10 w-10" : "h-8 w-8")}
-            />
+            <ChevronLeft className="w-7 h-7" />
           </Button>
-        </div>
-        {/* 우측 방향키 */}
-        <div className="col-start-3 row-start-2">
+          <div className="w-12 h-12" />
           <Button
+            aria-label="Move Right"
             variant="outline"
-            className={cn(
-              "w-full aspect-square bg-white/90 backdrop-blur-md hover:bg-white active:bg-white/100",
-              "touch-manipulation select-none shadow-lg",
-              isMobile ? "h-16" : "h-14"
-            )}
+            className="w-12 h-12 rounded-lg bg-white/90 shadow active:bg-blue-100 transition"
             onTouchStart={() => handleButtonPress("ArrowRight")}
             onClick={() => handleButtonPress("ArrowRight")}
           >
-            <ChevronRight
-              className={cn("h-8 w-8", isMobile ? "h-10 w-10" : "h-8 w-8")}
-            />
+            <ChevronRight className="w-7 h-7" />
           </Button>
         </div>
-        {/* 중앙 빈 공간 */}
-        <div className="col-start-2 row-start-2">
-          <div className="w-full aspect-square"></div>
-        </div>
-        {/* 하단 방향키 */}
-        <div className="col-start-2 row-start-3">
+        <div className="flex justify-center gap-2">
           <Button
+            aria-label="Move Down"
             variant="outline"
-            className={cn(
-              "w-full aspect-square bg-white/90 backdrop-blur-md hover:bg-white active:bg-white/100",
-              "touch-manipulation select-none shadow-lg",
-              isMobile ? "h-16" : "h-14"
-            )}
+            className="w-12 h-12 rounded-lg bg-white/90 shadow active:bg-blue-100 transition"
             onTouchStart={() => handleButtonPress("ArrowDown")}
             onClick={() => handleButtonPress("ArrowDown")}
           >
-            <ChevronDown
-              className={cn("h-8 w-8", isMobile ? "h-10 w-10" : "h-8 w-8")}
-            />
+            <ChevronDown className="w-7 h-7" />
           </Button>
         </div>
       </div>
