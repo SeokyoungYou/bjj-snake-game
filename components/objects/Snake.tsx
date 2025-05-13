@@ -1,4 +1,5 @@
 import { Position } from "@/types/game";
+import { useViewportSize } from "@/hooks/useViewportSize";
 
 interface SnakeProps {
   snake: Position[];
@@ -15,6 +16,8 @@ const Snake: React.FC<SnakeProps> = ({
   snakeBodyColor,
   eyeColor,
 }) => {
+  const { isMobile } = useViewportSize();
+  const eyeSize = isMobile ? 3 : 6;
   return (
     <>
       {snake.map((segment, index) => (
@@ -34,12 +37,20 @@ const Snake: React.FC<SnakeProps> = ({
           {index === 0 && (
             <div className="w-full h-full relative">
               <div
-                className="absolute top-1 left-1 w-1.5 h-1.5 rounded-full"
-                style={{ backgroundColor: eyeColor }}
+                className={`absolute top-1 left-1 rounded-full`}
+                style={{
+                  backgroundColor: eyeColor,
+                  width: eyeSize,
+                  height: eyeSize,
+                }}
               />
               <div
-                className="absolute top-1 right-1 w-1.5 h-1.5 rounded-full"
-                style={{ backgroundColor: eyeColor }}
+                className={`absolute top-1 right-1 rounded-full`}
+                style={{
+                  backgroundColor: eyeColor,
+                  width: eyeSize,
+                  height: eyeSize,
+                }}
               />
             </div>
           )}
