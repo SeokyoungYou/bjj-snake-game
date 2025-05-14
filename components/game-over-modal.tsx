@@ -39,7 +39,7 @@ export default function GameOverModal({
           <p>
             Highest Rank:{" "}
             <span className="font-bold">
-              {belt} Belt, {degree} Degree
+              {belt} Belt, {degree} Grau
             </span>
           </p>
           <div className="mt-4">

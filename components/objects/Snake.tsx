@@ -10,10 +10,24 @@ interface SnakeProps {
 
 const Snake: React.FC<SnakeProps> = ({ snake, cellSize, beltProgress }) => {
   const { isMobile } = useViewportSize();
-  const { snakeHeadColor, snakeBodyColor, eyeColor } =
+  const { snakeHeadColor, snakeBodyColor, eyeColor, stripeColor } =
     useBeltColors(beltProgress);
+  const stripeCount = beltProgress.degree;
 
   const eyeSize = isMobile ? 3 : 6;
+
+  const getSegmentColor = (index: number) => {
+    if (index === 0) return snakeHeadColor;
+
+    // 꼬리에서부터 stripeCount * 2 만큼의 세그먼트에 줄무늬 적용
+    const fromTail = snake.length - 1 - index;
+    if (fromTail < stripeCount * 2) {
+      return fromTail % 2 === 0 ? snakeBodyColor : stripeColor;
+    }
+
+    return snakeBodyColor;
+  };
+
   return (
     <>
       {snake.map((segment, index) => (
@@ -25,7 +39,7 @@ const Snake: React.FC<SnakeProps> = ({ snake, cellSize, beltProgress }) => {
             height: cellSize,
             left: segment.x * cellSize,
             top: segment.y * cellSize,
-            backgroundColor: index === 0 ? snakeHeadColor : snakeBodyColor,
+            backgroundColor: getSegmentColor(index),
             borderRadius: index === 0 ? "4px" : "2px",
             zIndex: 30,
           }}

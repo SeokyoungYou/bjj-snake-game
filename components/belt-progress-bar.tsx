@@ -43,9 +43,9 @@ export default function BeltProgressBar({
         }
       );
     }
-    // Degree 변경 감지 (단계 상승)
+    // Grau 변경 감지 (단계 상승)
     else if (prevDegreeRef.current < currentDegree) {
-      toast.success(`Advanced to ${currentDegree} Degree!`, {
+      toast.success(`Advanced to ${currentDegree} Grau!`, {
         duration: 2000,
         position: "top-center",
         style: {
@@ -66,7 +66,7 @@ export default function BeltProgressBar({
       {/* 현재 벨트와 다음 벨트 표시 */}
       <div className="flex justify-between mb-1">
         <span className="text-sm font-medium text-neutral-600">
-          {BELTS[currentBelt].name} Belt, {currentDegree} Degree
+          {BELTS[currentBelt].name} Belt, {currentDegree} Grau
         </span>
         <span className="text-sm font-medium text-neutral-600">
           {currentBelt < 4 ? BELTS[currentBelt + 1].name : "Master"} Belt
