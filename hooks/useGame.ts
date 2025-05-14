@@ -6,6 +6,7 @@ import {
   GameState,
   SpecialItem,
   ObstaclePosition,
+  BeltProgress,
 } from "@/types/game";
 import { BELTS, SPECIAL_ITEMS } from "@/lib/game-constants";
 import { calculateBeltProgress } from "@/lib/score-calculator";
@@ -19,33 +20,67 @@ const SPEED_INCREASE_PER_BELT = 30;
 const getInitialGameState = (
   selectedBeltIndex: number,
   gridSize: { width: number; height: number }
-): GameState => ({
-  snake: [
-    { x: Math.floor(gridSize.width / 2), y: Math.floor(gridSize.height / 2) },
-    {
-      x: Math.floor(gridSize.width / 2) - 1,
-      y: Math.floor(gridSize.height / 2),
+): GameState => {
+  const initialFoods = [];
+  const foodCount = 2 * Math.pow(2, selectedBeltIndex); // 2의 배수로 증가
+
+  for (let i = 0; i < foodCount; i++) {
+    let validPosition = false;
+    let newFood: Position | null = null;
+    let attempts = 0;
+    const maxAttempts = 50;
+
+    while (!validPosition && attempts < maxAttempts) {
+      attempts++;
+      newFood = {
+        x: Math.floor(Math.random() * gridSize.width),
+        y: Math.floor(Math.random() * gridSize.height),
+      };
+
+      validPosition = true;
+
+      // 다른 음식과 겹치는지 확인
+      for (let j = 0; j < initialFoods.length; j++) {
+        if (
+          newFood.x === initialFoods[j].x &&
+          newFood.y === initialFoods[j].y
+        ) {
+          validPosition = false;
+          break;
+        }
+      }
+    }
+
+    if (newFood && validPosition) {
+      initialFoods.push(newFood);
+    }
+  }
+
+  return {
+    snake: [
+      { x: Math.floor(gridSize.width / 2), y: Math.floor(gridSize.height / 2) },
+      {
+        x: Math.floor(gridSize.width / 2) - 1,
+        y: Math.floor(gridSize.height / 2),
+      },
+      {
+        x: Math.floor(gridSize.width / 2) - 2,
+        y: Math.floor(gridSize.height / 2),
+      },
+    ],
+    foods: initialFoods,
+    specialFood: null,
+    obstacles: [],
+    direction: "RIGHT",
+    isGameOver: false,
+    score: 0,
+    beltProgress: {
+      rank: BELTS[selectedBeltIndex].rank,
+      degree: 0,
     },
-    {
-      x: Math.floor(gridSize.width / 2) - 2,
-      y: Math.floor(gridSize.height / 2),
-    },
-  ],
-  food: {
-    x: Math.floor(gridSize.width / 2) + 5,
-    y: Math.floor(gridSize.height / 2),
-  },
-  specialFood: null,
-  obstacles: [],
-  direction: "RIGHT",
-  isGameOver: false,
-  score: 0,
-  beltProgress: {
-    rank: BELTS[selectedBeltIndex].rank,
-    degree: 0,
-  },
-  activeSpecialEffect: null,
-});
+    activeSpecialEffect: null,
+  };
+};
 
 export const useGame = (selectedBeltIndex: number) => {
   const { gridSize } = useGridSize();
@@ -124,7 +159,7 @@ export const useGame = (selectedBeltIndex: number) => {
   };
 
   const update = () => {
-    const { snake, food, obstacles, activeSpecialEffect } =
+    const { snake, foods, obstacles, activeSpecialEffect } =
       gameStateRef.current;
     const head = { ...snake[0] };
     const direction = nextDirectionRef.current;
@@ -166,11 +201,81 @@ export const useGame = (selectedBeltIndex: number) => {
     let ate = false;
     let points = 0;
 
-    if (food && head.x === food.x && head.y === food.y) {
-      ate = true;
-      points = 1;
+    // foods 배열에서 먹이를 먹었는지 확인
+    const newFoods = foods.filter((food) => {
+      if (head.x === food.x && head.y === food.y) {
+        ate = true;
+        points = 1;
+        return false;
+      }
+      return true;
+    });
+
+    if (ate) {
       setCombo((prev) => prev + 1);
-      spawnFood();
+
+      // 새로운 음식 생성
+      const currentBeltIndex = Object.values(BeltRank).indexOf(
+        gameStateRef.current.beltProgress.rank
+      );
+      const targetFoodCount = 2 * Math.pow(2, currentBeltIndex);
+
+      if (newFoods.length < targetFoodCount) {
+        let newFood: Position | null = null;
+        let validPosition = false;
+        let attempts = 0;
+        const maxAttempts = 50;
+
+        while (!validPosition && attempts < maxAttempts) {
+          attempts++;
+          newFood = {
+            x: Math.floor(Math.random() * gridSize.width),
+            y: Math.floor(Math.random() * gridSize.height),
+          };
+
+          validPosition = true;
+
+          // 뱀과 겹치는지 확인
+          for (let i = 0; i < newSnake.length; i++) {
+            if (newFood.x === newSnake[i].x && newFood.y === newSnake[i].y) {
+              validPosition = false;
+              break;
+            }
+          }
+
+          // 다른 음식과 겹치는지 확인
+          for (let i = 0; i < newFoods.length; i++) {
+            if (newFood.x === newFoods[i].x && newFood.y === newFoods[i].y) {
+              validPosition = false;
+              break;
+            }
+          }
+
+          // 장애물과 겹치는지 확인
+          for (let i = 0; i < obstacles.length; i++) {
+            if (
+              newFood.x === obstacles[i].position.x &&
+              newFood.y === obstacles[i].position.y
+            ) {
+              validPosition = false;
+              break;
+            }
+          }
+
+          // 특수 음식과 겹치는지 확인
+          if (
+            gameStateRef.current.specialFood &&
+            newFood.x === gameStateRef.current.specialFood.position.x &&
+            newFood.y === gameStateRef.current.specialFood.position.y
+          ) {
+            validPosition = false;
+          }
+        }
+
+        if (newFood && validPosition) {
+          newFoods.push(newFood);
+        }
+      }
 
       if (comboRef.current > 0 && comboRef.current % 5 === 0) {
         spawnSpecialItem();
@@ -201,6 +306,7 @@ export const useGame = (selectedBeltIndex: number) => {
     setGameState((prev) => ({
       ...prev,
       snake: newSnake,
+      foods: newFoods,
       direction: directionRef.current,
     }));
   };
@@ -238,51 +344,75 @@ export const useGame = (selectedBeltIndex: number) => {
   };
 
   const spawnFood = () => {
-    const { snake, obstacles, specialFood } = gameStateRef.current;
-    let newFood: Position | null = null;
-    let validPosition = false;
+    const { snake, foods, obstacles, specialFood } = gameStateRef.current;
+    const currentBeltIndex = Object.values(BeltRank).indexOf(
+      gameStateRef.current.beltProgress.rank
+    );
+    const targetFoodCount = 2 * Math.pow(2, currentBeltIndex);
 
-    while (!validPosition) {
-      newFood = {
-        x: Math.floor(Math.random() * gridSize.width),
-        y: Math.floor(Math.random() * gridSize.height),
-      };
+    if (foods.length < targetFoodCount) {
+      let newFood: Position | null = null;
+      let validPosition = false;
+      let attempts = 0;
+      const maxAttempts = 50;
 
-      validPosition = true;
+      while (!validPosition && attempts < maxAttempts) {
+        attempts++;
+        newFood = {
+          x: Math.floor(Math.random() * gridSize.width),
+          y: Math.floor(Math.random() * gridSize.height),
+        };
 
-      for (let i = 0; i < snake.length; i++) {
-        if (newFood.x === snake[i].x && newFood.y === snake[i].y) {
-          validPosition = false;
-          break;
+        validPosition = true;
+
+        // 뱀과 겹치는지 확인
+        for (let i = 0; i < snake.length; i++) {
+          if (newFood.x === snake[i].x && newFood.y === snake[i].y) {
+            validPosition = false;
+            break;
+          }
         }
-      }
 
-      for (let i = 0; i < obstacles.length; i++) {
+        // 다른 음식과 겹치는지 확인
+        for (let i = 0; i < foods.length; i++) {
+          if (newFood.x === foods[i].x && newFood.y === foods[i].y) {
+            validPosition = false;
+            break;
+          }
+        }
+
+        // 장애물과 겹치는지 확인
+        for (let i = 0; i < obstacles.length; i++) {
+          if (
+            newFood.x === obstacles[i].position.x &&
+            newFood.y === obstacles[i].position.y
+          ) {
+            validPosition = false;
+            break;
+          }
+        }
+
+        // 특수 음식과 겹치는지 확인
         if (
-          newFood.x === obstacles[i].position.x &&
-          newFood.y === obstacles[i].position.y
+          specialFood &&
+          newFood.x === specialFood.position.x &&
+          newFood.y === specialFood.position.y
         ) {
           validPosition = false;
-          break;
         }
       }
 
-      if (
-        specialFood &&
-        newFood.x === specialFood.position.x &&
-        newFood.y === specialFood.position.y
-      ) {
-        validPosition = false;
+      if (newFood && validPosition) {
+        setGameState((prev) => ({
+          ...prev,
+          foods: [...prev.foods, newFood],
+        }));
       }
-    }
-
-    if (newFood) {
-      setGameState((prev) => ({ ...prev, food: newFood }));
     }
   };
 
   const spawnSpecialItem = () => {
-    const { snake, food, obstacles, specialFood } = gameStateRef.current;
+    const { snake, foods, obstacles, specialFood } = gameStateRef.current;
     if (specialFood) return;
 
     let newItem: SpecialItem | null = null;
@@ -306,8 +436,11 @@ export const useGame = (selectedBeltIndex: number) => {
         }
       }
 
-      if (food && position.x === food.x && position.y === food.y) {
-        validPosition = false;
+      for (let i = 0; i < foods.length; i++) {
+        if (position.x === foods[i].x && position.y === foods[i].y) {
+          validPosition = false;
+          break;
+        }
       }
 
       for (let i = 0; i < obstacles.length; i++) {
@@ -413,9 +546,9 @@ export const useGame = (selectedBeltIndex: number) => {
         if (!validPosition) continue;
 
         if (
-          gameStateRef.current.food &&
-          position.x === gameStateRef.current.food.x &&
-          position.y === gameStateRef.current.food.y
+          gameStateRef.current.foods.some(
+            (food) => position.x === food.x && position.y === food.y
+          )
         ) {
           validPosition = false;
           continue;

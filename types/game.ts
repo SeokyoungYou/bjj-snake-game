@@ -30,7 +30,7 @@ export interface ObstaclePosition {
 
 export interface GameState {
   snake: Position[];
-  food: Position | null;
+  foods: Position[];
   specialFood: SpecialItem | null;
   obstacles: ObstaclePosition[];
   direction: Direction;

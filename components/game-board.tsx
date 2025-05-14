@@ -141,9 +141,9 @@ const GameBoard: React.FC<GameBoardProps> = ({
         />
 
         {/* Food */}
-        {gameState.food && (
-          <Food food={gameState.food} cellSize={adjustedCellSize} />
-        )}
+        {gameState.foods.map((food, index) => (
+          <Food key={`food-${index}`} food={food} cellSize={adjustedCellSize} />
+        ))}
 
         {/* Special food */}
         {gameState.specialFood && (
