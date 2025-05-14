@@ -78,14 +78,7 @@ export default function GameContainer() {
       </button> */}
 
       {gameState.isGameOver && (
-        <ModalGameOver
-          score={gameState.score}
-          beltRank={gameState.beltProgress.rank}
-          onPlayAgain={startGame}
-          snakeHeadColor={BELTS[selectedBeltIndex].color}
-          snakeBodyColor={BELTS[selectedBeltIndex].snakeColor}
-          eyeColor={BELTS[selectedBeltIndex].eyeColor}
-        />
+        <ModalGameOver gameState={gameState} onPlayAgain={startGame} />
       )}
     </div>
   );

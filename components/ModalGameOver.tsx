@@ -2,24 +2,21 @@
 
 import { motion } from "framer-motion";
 import { cn } from "@/lib/utils";
+import { GameState } from "@/types/game";
+import { useBeltColors } from "@/hooks/use-belt-colors";
 
 interface ModalGameOverProps {
-  score: number;
-  beltRank: string;
+  gameState: GameState;
   onPlayAgain: () => void;
-  snakeHeadColor: string;
-  snakeBodyColor: string;
-  eyeColor: string;
 }
 
 export default function ModalGameOver({
-  score,
-  beltRank,
+  gameState,
   onPlayAgain,
-  snakeHeadColor,
-  snakeBodyColor,
-  eyeColor,
 }: ModalGameOverProps) {
+  const { snakeHeadColor, snakeBodyColor, eyeColor } = useBeltColors(
+    gameState.beltProgress
+  );
   return (
     <motion.div
       initial={{ opacity: 0 }}
@@ -103,12 +100,14 @@ export default function ModalGameOver({
         >
           <p className="text-gray-600 text-lg">
             Final Score:{" "}
-            <span className="text-indigo-600 font-bold text-2xl">{score}</span>
+            <span className="text-indigo-600 font-bold text-2xl">
+              {gameState.score}
+            </span>
           </p>
           <p className="text-gray-600 text-lg">
             Final Belt:{" "}
             <span className="text-indigo-600 font-bold capitalize text-2xl">
-              {beltRank} Belt
+              {gameState.beltProgress.rank} Belt
             </span>
           </p>
         </motion.div>
