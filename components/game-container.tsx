@@ -30,9 +30,9 @@ export default function GameContainer() {
   const { isMobile } = useViewportSize();
 
   return (
-    <div className="flex flex-col items-center gap-6">
-      <div className="flex items-center justify-center gap-2 px-4 py-3 bg-gray-100 rounded-xl text-sm shadow-lg">
-        <span className="text-lg">⬅️⬆️⬇️➡️</span>
+    <div className="flex flex-col items-center gap-12">
+      <div className="flex items-center justify-center gap-2 px-4 py-3 bg-gray-100 rounded-xl text-xs shadow-lg">
+        <span className="text-xs">⬅️⬆️⬇️➡️</span>
         <span className={cn(isMobile ? "hidden" : "block")}>
           Use arrow keys to move the snake!
         </span>

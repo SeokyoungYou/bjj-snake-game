@@ -20,7 +20,7 @@ import Food from "./objects/Food";
 import SpecialFood from "./objects/SpecialFood";
 import SpecialEffect from "./objects/SpecialEffect";
 import BeltProgressBar from "./belt-progress-bar";
-import { PauseIcon, StopCircle, StopCircleIcon } from "lucide-react";
+import { PauseIcon, Square, StopCircle, StopCircleIcon } from "lucide-react";
 
 interface GameBoardProps {
   gameState: GameState;
@@ -47,7 +47,7 @@ const GameBoard: React.FC<GameBoardProps> = ({
 
   const scrollToGameBoard = () => {
     window.scrollTo({
-      top: (gameBoardRef.current?.offsetTop ?? 0) - 10,
+      top: (gameBoardRef.current?.offsetTop ?? 0) - 40,
       behavior: "smooth",
     });
   };
@@ -128,7 +128,7 @@ const GameBoard: React.FC<GameBoardProps> = ({
             )}
             onClick={onGameStop}
           >
-            <PauseIcon className="w-5 h-5" />
+            <Square className="w-5 h-5" />
           </button>
         )}
 
@@ -167,16 +167,16 @@ const GameBoard: React.FC<GameBoardProps> = ({
         )}
 
         {/* Score and combo display */}
-        <div className="absolute top-3 right-3 z-50">
-          <div className="backdrop-blur bg-black/40 px-3 py-1 rounded-xl shadow">
-            <span className="text-white font-bold text-base">
+        <div className="absolute -top-8 right-0 z-50">
+          <div className="backdrop-blur bg-black/20 px-2 py-0.5 rounded-xl shadow">
+            <span className="text-white font-bold text-sm">
               Score: {gameState.score}
             </span>
           </div>
         </div>
 
         {combo > 1 && (
-          <div className="absolute top-3 left-3 z-50">
+          <div className="absolute top-0 left-0 z-50">
             <div className="backdrop-blur bg-yellow-400/80 px-3 py-1 rounded-xl shadow">
               <span className="text-white font-bold text-base">
                 Combo: {combo}x
