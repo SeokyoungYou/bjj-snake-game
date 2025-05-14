@@ -12,7 +12,7 @@ import Food from "./objects/Food";
 import SpecialFood from "./objects/SpecialFood";
 import SpecialEffect from "./objects/SpecialEffect";
 import BeltProgressBar from "./belt-progress-bar";
-import { Square } from "lucide-react";
+import { RefreshCcw, RefreshCw, RotateCcw, Square, Undo } from "lucide-react";
 
 interface GameBoardProps {
   gameState: GameState;
@@ -120,7 +120,7 @@ const GameBoard: React.FC<GameBoardProps> = ({
             )}
             onClick={onGameStop}
           >
-            <Square className="w-5 h-5" />
+            <RotateCcw className="w-5 h-5" />
           </button>
         )}
 
