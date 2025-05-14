@@ -7,6 +7,7 @@ import {
   BeltRank,
   SpecialItem,
   ObstaclePosition,
+  GameState,
 } from "@/types/game";
 import { cn } from "@/lib/utils";
 import { useBeltColors } from "@/hooks/use-belt-colors";
@@ -14,60 +15,31 @@ import GameControls from "./game-controls";
 import { useViewportSize } from "@/hooks/useViewportSize";
 import { useGridSize } from "@/hooks/useGridSize";
 import Obstacle from "./objects/Obstacle";
-import Boss from "./objects/Boss";
 import Snake from "./objects/Snake";
 import Food from "./objects/Food";
 import SpecialFood from "./objects/SpecialFood";
 import SpecialEffect from "./objects/SpecialEffect";
 import BeltProgressBar from "./belt-progress-bar";
+import { PauseIcon, StopCircle, StopCircleIcon } from "lucide-react";
 
 interface GameBoardProps {
-  snake: Position[];
-  food: Position | null;
-  specialFood: SpecialItem | null;
-  obstacles: ObstaclePosition[];
-  boss: any | null;
-  beltProgress: BeltProgress;
-  activeSpecialEffect: string | null;
-  score: number;
+  gameState: GameState;
   combo: number;
   onGameStart: () => void;
   onGameStop: () => void;
   isRunning: boolean;
-  snakeColor: {
-    snake: string;
-    background: string;
-  };
-  currentBeltIndex: number;
-  currentDegree: number;
 }
 
 const GameBoard: React.FC<GameBoardProps> = ({
-  snake,
-  food,
-  specialFood,
-  obstacles,
-  boss,
-  beltProgress,
-  activeSpecialEffect,
-  score,
+  gameState,
   combo,
   onGameStart,
   onGameStop,
   isRunning,
-  snakeColor,
-  currentBeltIndex,
-  currentDegree,
 }) => {
   const { cellSize, gridSize, isMobile } = useGridSize();
   const gameBoardRef = React.useRef<HTMLDivElement>(null);
-  const {
-    backgroundColor,
-    gridColor,
-    snakeHeadColor,
-    snakeBodyColor,
-    eyeColor,
-  } = useBeltColors(beltProgress);
+  const { backgroundColor, gridColor } = useBeltColors(gameState.beltProgress);
 
   const adjustedCellSize = cellSize;
   const adjustedWidth = gridSize.width * cellSize;
@@ -95,8 +67,8 @@ const GameBoard: React.FC<GameBoardProps> = ({
       <div
         ref={gameBoardRef}
         className={cn(
-          "game-board relative overflow-hidden rounded-2xl border-2 border-gray-300 shadow-xl bg-white",
-          { "special-effect-glow": activeSpecialEffect }
+          "game-board relative overflow-visible  border-1 border-gray-300 shadow-xl bg-white r",
+          { "special-effect-glow": gameState.activeSpecialEffect }
         )}
         style={{
           width: adjustedWidth,
@@ -106,7 +78,7 @@ const GameBoard: React.FC<GameBoardProps> = ({
         }}
       >
         {/* Grid lines */}
-        <div className="grid-lines absolute inset-0 z-0">
+        <div className="grid-lines absolute inset-0 z-0 flex items-end justify-center">
           {Array.from({ length: gridSize.width + 1 }).map((_, i) => (
             <div
               key={`v-line-${i}`}
@@ -134,10 +106,34 @@ const GameBoard: React.FC<GameBoardProps> = ({
               }}
             />
           ))}
+          {!isRunning && (
+            <button
+              className={cn(
+                "px-6 py-3 rounded-xl text-white font-semibold shadow-lg absolute  transition animate-in fade-in-0 duration-300 mb-10 w-1/2",
+
+                "bg-indigo-600 hover:bg-indigo-700"
+              )}
+              onClick={handleGameStart}
+            >
+              Start
+            </button>
+          )}
         </div>
 
+        {isRunning && (
+          <button
+            className={cn(
+              "px-3 py-3 rounded-xl text-white font-semibold shadow-lg absolute  transition animate-in fade-in-0 duration-300 w-fit -bottom-32 right-0",
+              "bg-red-500 hover:bg-red-600"
+            )}
+            onClick={onGameStop}
+          >
+            <PauseIcon className="w-5 h-5" />
+          </button>
+        )}
+
         {/* Obstacles */}
-        {obstacles.map((obstacle, index) => (
+        {gameState.obstacles.map((obstacle, index) => (
           <Obstacle
             key={`obstacle-${index}`}
             obstacle={obstacle}
@@ -145,36 +141,36 @@ const GameBoard: React.FC<GameBoardProps> = ({
           />
         ))}
 
-        {/* Boss */}
-        {boss && <Boss boss={boss} cellSize={adjustedCellSize} />}
-
         {/* Snake */}
         <Snake
-          snake={snake}
+          snake={gameState.snake}
           cellSize={adjustedCellSize}
-          snakeHeadColor={snakeHeadColor}
-          snakeBodyColor={snakeBodyColor}
-          eyeColor={eyeColor}
+          beltProgress={gameState.beltProgress}
         />
 
         {/* Food */}
-        {food && <Food food={food} cellSize={adjustedCellSize} />}
+        {gameState.food && (
+          <Food food={gameState.food} cellSize={adjustedCellSize} />
+        )}
 
         {/* Special food */}
-        {specialFood && (
-          <SpecialFood specialFood={specialFood} cellSize={adjustedCellSize} />
+        {gameState.specialFood && (
+          <SpecialFood
+            specialFood={gameState.specialFood}
+            cellSize={adjustedCellSize}
+          />
         )}
 
         {/* Special effect */}
-        {activeSpecialEffect && (
-          <SpecialEffect activeSpecialEffect={activeSpecialEffect} />
+        {gameState.activeSpecialEffect && (
+          <SpecialEffect activeSpecialEffect={gameState.activeSpecialEffect} />
         )}
 
         {/* Score and combo display */}
         <div className="absolute top-3 right-3 z-50">
           <div className="backdrop-blur bg-black/40 px-3 py-1 rounded-xl shadow">
             <span className="text-white font-bold text-base">
-              Score: {score}
+              Score: {gameState.score}
             </span>
           </div>
         </div>
@@ -192,26 +188,9 @@ const GameBoard: React.FC<GameBoardProps> = ({
 
       {/* Game control buttons */}
       <div className="flex flex-col gap-3 w-full">
-        {isRunning ? (
-          <div className=" w-full max-w-xl">
-            <BeltProgressBar
-              currentBelt={currentBeltIndex}
-              currentDegree={currentDegree}
-            />
-          </div>
-        ) : (
-          <button
-            className={cn(
-              "px-6 py-3 rounded-xl text-white font-semibold shadow-lg transition",
-              isRunning
-                ? "bg-red-500 hover:bg-red-600"
-                : "bg-indigo-600 hover:bg-indigo-700"
-            )}
-            onClick={isRunning ? onGameStop : handleGameStart}
-          >
-            {isRunning ? "Stop" : "Start"}
-          </button>
-        )}
+        <div className=" w-full max-w-xl">
+          <BeltProgressBar beltProgress={gameState.beltProgress} />
+        </div>
 
         {/* 모바일 컨트롤 - 게임 실행 중일 때만 표시 */}
         {isRunning && (

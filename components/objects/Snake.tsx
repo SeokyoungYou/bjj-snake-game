@@ -1,22 +1,18 @@
-import { Position } from "@/types/game";
+import { BeltProgress, Position } from "@/types/game";
 import { useViewportSize } from "@/hooks/useViewportSize";
+import { useBeltColors } from "@/hooks/use-belt-colors";
 
 interface SnakeProps {
   snake: Position[];
   cellSize: number;
-  snakeHeadColor: string;
-  snakeBodyColor: string;
-  eyeColor: string;
+  beltProgress: BeltProgress;
 }
 
-const Snake: React.FC<SnakeProps> = ({
-  snake,
-  cellSize,
-  snakeHeadColor,
-  snakeBodyColor,
-  eyeColor,
-}) => {
+const Snake: React.FC<SnakeProps> = ({ snake, cellSize, beltProgress }) => {
   const { isMobile } = useViewportSize();
+  const { snakeHeadColor, snakeBodyColor, eyeColor } =
+    useBeltColors(beltProgress);
+
   const eyeSize = isMobile ? 3 : 6;
   return (
     <>

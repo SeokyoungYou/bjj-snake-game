@@ -2,7 +2,7 @@
 
 import { useEffect, useRef } from "react";
 import { BELTS } from "@/lib/game-constants";
-import { BeltProgressBarProps } from "@/types/game";
+import { BeltProgress } from "@/types/game";
 import { toast } from "sonner";
 
 /**
@@ -10,10 +10,17 @@ import { toast } from "sonner";
  * 현재 벨트 등급과 단계를 시각적으로 표시합니다.
  * 다음 벨트까지의 진행 상황을 보여줍니다.
  */
+interface BeltProgressBarProps {
+  beltProgress: BeltProgress;
+}
+
 export default function BeltProgressBar({
-  currentBelt,
-  currentDegree,
+  beltProgress,
 }: BeltProgressBarProps) {
+  const currentBelt = BELTS.findIndex(
+    (belt) => belt.rank === beltProgress.rank
+  );
+  const currentDegree = beltProgress.degree;
   const prevBeltRef = useRef(currentBelt);
   const prevDegreeRef = useRef(currentDegree);
 
