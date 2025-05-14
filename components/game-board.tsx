@@ -101,7 +101,7 @@ const GameBoard: React.FC<GameBoardProps> = ({
           {!isRunning && (
             <button
               className={cn(
-                "px-6 py-3 rounded-xl text-white font-semibold shadow-lg absolute  transition animate-in fade-in-0 duration-300 mb-10 w-1/2",
+                "px-6 py-3 z-50 rounded-xl text-white font-semibold shadow-lg absolute  transition animate-in fade-in-0 duration-300 mb-10 w-1/2",
 
                 "bg-indigo-600 hover:bg-indigo-700"
               )}
