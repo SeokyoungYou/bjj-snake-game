@@ -1,18 +1,10 @@
 "use client";
 
 import React from "react";
-import {
-  Position,
-  BeltProgress,
-  BeltRank,
-  SpecialItem,
-  ObstaclePosition,
-  GameState,
-} from "@/types/game";
+import { GameState } from "@/types/game";
 import { cn } from "@/lib/utils";
 import { useBeltColors } from "@/hooks/use-belt-colors";
 import GameControls from "./game-controls";
-import { useViewportSize } from "@/hooks/useViewportSize";
 import { useGridSize } from "@/hooks/useGridSize";
 import Obstacle from "./objects/Obstacle";
 import Snake from "./objects/Snake";
@@ -20,7 +12,7 @@ import Food from "./objects/Food";
 import SpecialFood from "./objects/SpecialFood";
 import SpecialEffect from "./objects/SpecialEffect";
 import BeltProgressBar from "./belt-progress-bar";
-import { PauseIcon, Square, StopCircle, StopCircleIcon } from "lucide-react";
+import { Square } from "lucide-react";
 
 interface GameBoardProps {
   gameState: GameState;

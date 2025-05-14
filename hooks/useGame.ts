@@ -13,9 +13,8 @@ import { toast } from "sonner";
 import { useGridSize } from "./useGridSize";
 
 // Game constants
-const CELL_SIZE = 20;
-const INITIAL_SPEED = 150;
-const SPEED_INCREASE_PER_BELT = 20;
+const INITIAL_SPEED = 200;
+const SPEED_INCREASE_PER_BELT = 30;
 
 const getInitialGameState = (
   selectedBeltIndex: number,
