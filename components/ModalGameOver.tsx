@@ -107,7 +107,7 @@ export default function ModalGameOver({
           <p className="text-gray-600 text-lg">
             Final Belt:{" "}
             <span className="text-indigo-600 font-bold capitalize text-2xl">
-              {gameState.beltProgress.rank} Belt
+              {gameState?.beltProgress?.rank} Belt
             </span>
           </p>
         </motion.div>

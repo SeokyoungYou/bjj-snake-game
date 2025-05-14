@@ -2,12 +2,23 @@ import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "@/styles/globals.css";
 import { Toaster } from "@/components/ui/toaster";
+import { getBaseUrl } from "@/lib/metaData";
 
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
   title: "BJJ Snake Game",
   description: "Progress from White Belt to Black Belt in this snake game!",
+  icons: {
+    icon: "/favicon.ico",
+  },
+  openGraph: {
+    images: [
+      {
+        url: `${getBaseUrl()}/og-image.png`,
+      },
+    ],
+  },
 };
 
 export default function RootLayout({
