@@ -38,6 +38,9 @@ export interface GameState {
   score: number;
   beltProgress: BeltProgress;
   activeSpecialEffect: string | null;
+  combo: number;
+  comboTimeLeft: number;
+  comboMessage: string;
 }
 
 export interface GameOverModalProps {

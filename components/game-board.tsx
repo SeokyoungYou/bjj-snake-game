@@ -16,7 +16,6 @@ import { RefreshCcw, RefreshCw, RotateCcw, Square, Undo } from "lucide-react";
 
 interface GameBoardProps {
   gameState: GameState;
-  combo: number;
   onGameStart: () => void;
   onGameStop: () => void;
   isRunning: boolean;
@@ -24,7 +23,6 @@ interface GameBoardProps {
 
 const GameBoard: React.FC<GameBoardProps> = ({
   gameState,
-  combo,
   onGameStart,
   onGameStop,
   isRunning,
@@ -167,15 +165,21 @@ const GameBoard: React.FC<GameBoardProps> = ({
           </div>
         </div>
 
-        {combo > 1 && (
-          <div className="absolute top-0 left-0 z-50">
-            <div className="backdrop-blur bg-yellow-400/80 px-3 py-1 rounded-xl shadow">
-              <span className="text-white font-bold text-base">
-                Combo: {combo}x
+        <div className="absolute -top-8 left-0 z-50 py-0.5 ">
+          {gameState.combo > 1 ? (
+            <div className="flex items-center gap-2">
+              <span className="font-bold text-sm text-indigo-400">
+                {gameState.comboMessage}
+              </span>
+
+              <span className="text-neutral-400 text-xs">
+                {gameState.comboTimeLeft}s Left
               </span>
             </div>
-          </div>
-        )}
+          ) : (
+            <span className="text-neutral-400 text-sm">No Combo</span>
+          )}
+        </div>
       </div>
 
       {/* Game control buttons */}

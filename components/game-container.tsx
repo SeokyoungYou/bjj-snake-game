@@ -17,7 +17,6 @@ export default function GameContainer() {
 
   const {
     gameState,
-    combo,
     isRunning,
     startGame,
     stopGame,
@@ -43,7 +42,6 @@ export default function GameContainer() {
 
       <GameBoard
         gameState={gameState}
-        combo={combo}
         onGameStart={startGame}
         onGameStop={stopGame}
         isRunning={isRunning}

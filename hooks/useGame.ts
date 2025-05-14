@@ -16,6 +16,7 @@ import { useGridSize } from "./useGridSize";
 // Game constants
 const INITIAL_SPEED = 200;
 const SPEED_INCREASE_PER_BELT = 30;
+const COMBO_TIME_LEFT = 5;
 
 const getInitialGameState = (
   selectedBeltIndex: number,
@@ -79,6 +80,9 @@ const getInitialGameState = (
       degree: 0,
     },
     activeSpecialEffect: null,
+    combo: 0,
+    comboTimeLeft: 0,
+    comboMessage: "",
   };
 };
 
@@ -87,13 +91,12 @@ export const useGame = (selectedBeltIndex: number) => {
   const [gameState, setGameState] = useState<GameState>(
     getInitialGameState(selectedBeltIndex, gridSize)
   );
-  const [combo, setCombo] = useState(0);
   const [isRunning, setIsRunning] = useState(false);
-  const [lastMoveTime, setLastMoveTime] = useState(0);
+  const [lastMoveTime, setLastMoveTime] = useState(Date.now());
+  const lastMoveTimeRef = useRef(Date.now());
   const [promotionMessage, setPromotionMessage] = useState<string | null>(null);
 
   const gameStateRef = useRef(gameState);
-  const comboRef = useRef(combo);
   const isRunningRef = useRef(isRunning);
   const directionRef = useRef<Direction>("RIGHT");
   const nextDirectionRef = useRef<Direction>("RIGHT");
@@ -104,12 +107,8 @@ export const useGame = (selectedBeltIndex: number) => {
   }, [gameState]);
 
   useEffect(() => {
-    comboRef.current = combo;
-  }, [combo]);
-
-  useEffect(() => {
-    isRunningRef.current = isRunning;
-  }, [isRunning]);
+    lastMoveTimeRef.current = lastMoveTime;
+  }, [lastMoveTime]);
 
   const startGame = () => {
     if (isRunningRef.current) return;
@@ -163,6 +162,35 @@ export const useGame = (selectedBeltIndex: number) => {
       gameStateRef.current;
     const head = { ...snake[0] };
     const direction = nextDirectionRef.current;
+    const currentTime = Date.now();
+    const timeDiff = currentTime - lastMoveTimeRef.current;
+
+    // 콤보 타임아웃 체크 및 업데이트
+    if (timeDiff > 5000) {
+      setGameState((prev) => ({
+        ...prev,
+        combo: 0,
+        comboTimeLeft: 0,
+        comboMessage: "",
+      }));
+    } else if (gameStateRef.current.combo > 0) {
+      setGameState((prev) => ({
+        ...prev,
+        comboTimeLeft: Math.max(
+          0,
+          COMBO_TIME_LEFT - Math.floor(timeDiff / 1000)
+        ),
+      }));
+    }
+
+    console.log("현재 게임 상태:", {
+      snake: snake,
+      foods: foods,
+      combo: gameStateRef.current.combo,
+      comboTimeLeft: gameStateRef.current.comboTimeLeft,
+      lastMoveTime: lastMoveTimeRef.current,
+      currentTime: currentTime,
+    });
 
     switch (direction) {
       case "UP":
@@ -212,7 +240,21 @@ export const useGame = (selectedBeltIndex: number) => {
     });
 
     if (ate) {
-      setCombo((prev) => prev + 1);
+      console.log("음식을 먹음! 현재 콤보:", gameStateRef.current.combo);
+      const currentTime = Date.now();
+      lastMoveTimeRef.current = currentTime;
+      setLastMoveTime(currentTime);
+
+      setGameState((prev) => {
+        const newCombo = prev.combo + 1;
+        console.log("새로운 콤보:", newCombo);
+        return {
+          ...prev,
+          combo: newCombo,
+          comboMessage: newCombo > 1 ? `Combo x${newCombo}` : "",
+          comboTimeLeft: COMBO_TIME_LEFT,
+        };
+      });
 
       // 새로운 음식 생성
       const currentBeltIndex = Object.values(BeltRank).indexOf(
@@ -277,7 +319,11 @@ export const useGame = (selectedBeltIndex: number) => {
         }
       }
 
-      if (comboRef.current > 0 && comboRef.current % 5 === 0) {
+      if (
+        gameStateRef.current.combo > 0 &&
+        gameStateRef.current.combo % 5 === 0
+      ) {
+        console.log("특수 아이템 생성 조건 충족!");
         spawnSpecialItem();
       }
     }
@@ -296,12 +342,6 @@ export const useGame = (selectedBeltIndex: number) => {
     } else {
       updateScore(points);
     }
-
-    const currentTime = Date.now();
-    if (currentTime - lastMoveTime > 3000) {
-      setCombo(0);
-    }
-    setLastMoveTime(currentTime);
 
     setGameState((prev) => ({
       ...prev,
@@ -617,7 +657,6 @@ export const useGame = (selectedBeltIndex: number) => {
 
   return {
     gameState,
-    combo,
     isRunning,
     startGame,
     stopGame,
