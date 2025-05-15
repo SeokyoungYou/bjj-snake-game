@@ -142,11 +142,10 @@ const createSpecialItemSound = () => {
 
   const now = Tone.now();
   // 특수 아이템 획득 소리
-  synth.triggerAttackRelease("C5", "16n", now);
-  synth.triggerAttackRelease("E5", "16n", now + 0.1);
-  synth.triggerAttackRelease("G5", "16n", now + 0.2);
-  synth.triggerAttackRelease("C6", "16n", now + 0.3);
-  synth.triggerAttackRelease("E6", "16n", now + 0.4);
+  synth.triggerAttackRelease("G5", "16n", now);
+  synth.triggerAttackRelease("G5", "16n", now + 0.1);
+  synth.triggerAttackRelease("C6", "16n", now + 0.2);
+  synth.triggerAttackRelease("E6", "16n", now + 0.3);
 };
 
 // 승급 소리
