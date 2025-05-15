@@ -10,6 +10,8 @@ export const useKeyboardControls = (
     gameSounds.init();
   }, []);
 
+  // TODO: refactor here
+
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       console.log("keyboard");
