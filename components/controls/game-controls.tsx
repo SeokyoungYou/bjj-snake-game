@@ -5,11 +5,7 @@ import { useViewportSize } from "@/hooks/useViewportSize";
 import { ControlButtonDirection } from "@/types/game";
 import ControlButton from "./ControlButton";
 
-interface GameControlsProps {
-  onPlayAgain?: () => void;
-}
-
-export default function GameControls({ onPlayAgain }: GameControlsProps) {
+export default function GameControls() {
   const { isMobile } = useViewportSize();
 
   if (!isMobile) return null;

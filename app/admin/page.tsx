@@ -1,4 +1,5 @@
 "use client";
+import GameControls from "@/components/controls/game-controls";
 import { Button } from "@/components/ui/button";
 import { gameSounds } from "@/lib/sounds";
 import React, { useEffect } from "react";
@@ -30,6 +31,7 @@ export default function page() {
           </div>
         </div>
       </section>
+      <GameControls />
     </div>
   );
 }

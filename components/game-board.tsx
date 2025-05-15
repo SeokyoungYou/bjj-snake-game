@@ -182,7 +182,7 @@ const GameBoard: React.FC<GameBoardProps> = ({
         {/* 모바일 컨트롤 - 게임 실행 중일 때만 표시 */}
         {isRunning && (
           <div className="md:hidden">
-            <GameControls onPlayAgain={handleGameStart} />
+            <GameControls />
           </div>
         )}
       </div>
