@@ -332,7 +332,8 @@ export const gameSounds = {
     createStartSound();
     createBackgroundMusic();
   },
-  stop: stopBackgroundMusic,
+  createBackgroundMusic,
+  stopBackgroundMusic,
   eat: createEatSound,
   gameOver: () => {
     createGameOverSound();

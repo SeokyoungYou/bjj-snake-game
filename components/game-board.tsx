@@ -180,11 +180,11 @@ const GameBoard: React.FC<GameBoardProps> = ({
         </div>
 
         {/* 모바일 컨트롤 - 게임 실행 중일 때만 표시 */}
-        {/* {isRunning && ( */}
-        <div className="md:hidden">
-          <GameControls onPlayAgain={handleGameStart} />
-        </div>
-        {/* )} */}
+        {isRunning && (
+          <div className="md:hidden">
+            <GameControls onPlayAgain={handleGameStart} />
+          </div>
+        )}
       </div>
     </div>
   );
