@@ -13,6 +13,7 @@ import { calculateBeltProgress } from "@/lib/score-calculator";
 import { toast } from "sonner";
 import { useGridSize } from "./useGridSize";
 import { useScrollLock } from "./useScrollLock";
+import { gameSounds } from "@/lib/sounds";
 
 // Game constants
 const INITIAL_SPEED = 200;
@@ -112,8 +113,18 @@ export const useGame = (selectedBeltIndex: number) => {
     lastMoveTimeRef.current = lastMoveTime;
   }, [lastMoveTime]);
 
-  const startGame = () => {
+  useEffect(() => {
+    // 게임 시작 시 효과음 초기화
+    gameSounds.init();
+  }, []);
+
+  const startGame = async () => {
     if (isRunningRef.current) return;
+
+    // 게임 시작 시 효과음 초기화
+    await gameSounds.init();
+    // 게임 시작 소리 재생
+    gameSounds.start();
 
     stopGame();
     setGameState(getInitialGameState(selectedBeltIndex, gridSize));
@@ -157,6 +168,7 @@ export const useGame = (selectedBeltIndex: number) => {
   };
 
   const handleGameOver = () => {
+    gameSounds.gameOver();
     stopGame();
     setGameState((prev) => ({ ...prev, isGameOver: true }));
     unlockScroll();
@@ -250,6 +262,8 @@ export const useGame = (selectedBeltIndex: number) => {
       lastMoveTimeRef.current = currentTime;
       setLastMoveTime(currentTime);
 
+      gameSounds.eat();
+
       setGameState((prev) => {
         const newCombo = prev.combo + 1;
         console.log("새로운 콤보:", newCombo);
@@ -338,6 +352,7 @@ export const useGame = (selectedBeltIndex: number) => {
       head.x === gameStateRef.current.specialFood.position.x &&
       head.y === gameStateRef.current.specialFood.position.y
     ) {
+      gameSounds.specialItem();
       activateSpecialEffect(gameStateRef.current.specialFood.type);
       setGameState((prev) => ({ ...prev, specialFood: null }));
     }
@@ -520,6 +535,7 @@ export const useGame = (selectedBeltIndex: number) => {
       );
 
       if (rank !== prev.beltProgress.rank) {
+        gameSounds.promotion();
         generateObstacles();
         toast.success(
           `Congratulations! You've been promoted to ${rank.toUpperCase()} Belt! 🎉`,
