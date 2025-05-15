@@ -17,7 +17,12 @@ export interface BeltProgress {
 }
 
 export type Direction = "UP" | "DOWN" | "LEFT" | "RIGHT";
-
+export enum ControlButtonDirection {
+  ArrowUp = "ArrowUp",
+  ArrowDown = "ArrowDown",
+  ArrowLeft = "ArrowLeft",
+  ArrowRight = "ArrowRight",
+}
 export interface SpecialItem {
   position: Position;
   type: string;

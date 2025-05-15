@@ -4,7 +4,7 @@ import React from "react";
 import { GameState } from "@/types/game";
 import { cn } from "@/lib/utils";
 import { useBeltColors } from "@/hooks/use-belt-colors";
-import GameControls from "./game-controls";
+import GameControls from "./controls/game-controls";
 import { useGridSize } from "@/hooks/useGridSize";
 import Obstacle from "./objects/Obstacle";
 import Snake from "./objects/Snake";
@@ -180,11 +180,11 @@ const GameBoard: React.FC<GameBoardProps> = ({
         </div>
 
         {/* 모바일 컨트롤 - 게임 실행 중일 때만 표시 */}
-        {isRunning && (
-          <div className="md:hidden">
-            <GameControls onPlayAgain={handleGameStart} />
-          </div>
-        )}
+        {/* {isRunning && ( */}
+        <div className="md:hidden">
+          <GameControls onPlayAgain={handleGameStart} />
+        </div>
+        {/* )} */}
       </div>
     </div>
   );
