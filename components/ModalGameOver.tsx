@@ -4,6 +4,7 @@ import { motion } from "framer-motion";
 import { cn } from "@/lib/utils";
 import { GameState } from "@/types/game";
 import { useBeltColors } from "@/hooks/use-belt-colors";
+import { getRandomQuotes } from "@/constants/quote";
 
 interface ModalGameOverProps {
   gameState: GameState;
@@ -107,7 +108,8 @@ export default function ModalGameOver({
           <p className="text-gray-600 text-lg">
             Final Belt:{" "}
             <span className="text-indigo-600 font-bold capitalize text-2xl">
-              {gameState?.beltProgress?.rank} Belt
+              {gameState?.beltProgress?.rank} Belt{" "}
+              {gameState?.beltProgress?.degree} Grau
             </span>
           </p>
         </motion.div>
@@ -120,12 +122,12 @@ export default function ModalGameOver({
           whileTap={{ scale: 0.95 }}
           onClick={() => {
             onPlayAgain();
-            scrollToGameBoard();
           }}
           className="w-full px-6 py-3 bg-indigo-600 text-white rounded-xl font-semibold text-lg hover:bg-indigo-700 transition-all duration-200 shadow-lg"
         >
           Play Again
         </motion.button>
+        <p className="text-xs text-gray-400 mt-3">{getRandomQuotes()}</p>
       </motion.div>
     </motion.div>
   );

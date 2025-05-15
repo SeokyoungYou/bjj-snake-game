@@ -56,8 +56,6 @@ export const BELTS = [
 export const SPECIAL_ITEMS = [
   "Armbar", // Breaks through obstacles
   "Triangle", // Temporary invincibility
-  "Sweep", // Reverses direction of boss
-  "Escape", // Teleport to safe location when in danger
-  "Defense", // Can pass through obstacles
-  "Attack", // Can defeat bosses
+  "Rear Naked Choke", // Can defeat bosses
+  "Heel Hook", // Can defeat bosses
 ];

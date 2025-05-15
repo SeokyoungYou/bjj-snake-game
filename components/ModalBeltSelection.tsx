@@ -1,4 +1,4 @@
-import { BELTS } from "@/lib/game-constants";
+import { BELTS } from "@/constants/game-constants";
 import { BeltRank } from "@/types/game";
 import { SCORE_THRESHOLDS } from "@/lib/score-calculator";
 

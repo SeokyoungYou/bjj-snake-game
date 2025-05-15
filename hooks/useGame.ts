@@ -8,7 +8,7 @@ import {
   ObstaclePosition,
   BeltProgress,
 } from "@/types/game";
-import { BELTS, SPECIAL_ITEMS } from "@/lib/game-constants";
+import { BELTS, SPECIAL_ITEMS } from "@/constants/game-constants";
 import { calculateBeltProgress } from "@/lib/score-calculator";
 import { toast } from "sonner";
 import { useGridSize } from "./useGridSize";

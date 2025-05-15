@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import GameBoard from "./game-board";
-import { BELTS } from "@/lib/game-constants";
+import { BELTS } from "@/constants/game-constants";
 import { calculateBeltProgress } from "@/lib/score-calculator";
 import ModalBeltSelection from "./ModalBeltSelection";
 import { useGame } from "@/hooks/useGame";

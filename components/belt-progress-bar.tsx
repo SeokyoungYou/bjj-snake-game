@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef } from "react";
-import { BELTS } from "@/lib/game-constants";
+import { BELTS } from "@/constants/game-constants";
 import { BeltProgress } from "@/types/game";
 import { toast } from "sonner";
 

@@ -1,5 +1,5 @@
 import { BeltProgress, BeltRank } from "@/types/game";
-import { BELTS } from "@/lib/game-constants";
+import { BELTS } from "@/constants/game-constants";
 
 interface BeltColors {
   beltColor: string;
