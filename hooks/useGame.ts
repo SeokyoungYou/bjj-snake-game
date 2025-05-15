@@ -12,6 +12,7 @@ import { BELTS, SPECIAL_ITEMS } from "@/lib/game-constants";
 import { calculateBeltProgress } from "@/lib/score-calculator";
 import { toast } from "sonner";
 import { useGridSize } from "./useGridSize";
+import { useScrollLock } from "./useScrollLock";
 
 // Game constants
 const INITIAL_SPEED = 200;
@@ -95,6 +96,7 @@ export const useGame = (selectedBeltIndex: number) => {
   const [lastMoveTime, setLastMoveTime] = useState(Date.now());
   const lastMoveTimeRef = useRef(Date.now());
   const [promotionMessage, setPromotionMessage] = useState<string | null>(null);
+  const { lock: lockScroll, unlock: unlockScroll } = useScrollLock();
 
   const gameStateRef = useRef(gameState);
   const isRunningRef = useRef(isRunning);
@@ -118,6 +120,7 @@ export const useGame = (selectedBeltIndex: number) => {
     directionRef.current = "RIGHT";
     nextDirectionRef.current = "RIGHT";
     generateObstacles();
+    lockScroll();
 
     setIsRunning(true);
     isRunningRef.current = true;
@@ -150,11 +153,13 @@ export const useGame = (selectedBeltIndex: number) => {
     }
     setIsRunning(false);
     isRunningRef.current = false;
+    unlockScroll();
   };
 
   const handleGameOver = () => {
     stopGame();
     setGameState((prev) => ({ ...prev, isGameOver: true }));
+    unlockScroll();
   };
 
   const update = () => {

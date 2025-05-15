@@ -10,6 +10,7 @@ import { useKeyboardControls } from "@/hooks/useKeyboardControls";
 import { cn } from "@/lib/utils";
 import { useViewportSize } from "@/hooks/useViewportSize";
 import ModalGameOver from "./ModalGameOver";
+import { useGameRef } from "@/hooks/useGameRef";
 
 export default function GameContainer() {
   const [selectedBeltIndex, setSelectedBeltIndex] = useState(0);
@@ -27,6 +28,7 @@ export default function GameContainer() {
 
   useKeyboardControls(directionRef, nextDirectionRef);
   const { isMobile } = useViewportSize();
+  const { gameBoardRef, scrollToGameBoard } = useGameRef();
 
   return (
     <div className="flex flex-col items-center gap-12">
@@ -45,6 +47,8 @@ export default function GameContainer() {
         onGameStart={startGame}
         onGameStop={stopGame}
         isRunning={isRunning}
+        gameBoardRef={gameBoardRef}
+        scrollToGameBoard={scrollToGameBoard}
       />
 
       <ModalBeltSelection
@@ -76,7 +80,13 @@ export default function GameContainer() {
       </button> */}
 
       {gameState.isGameOver && (
-        <ModalGameOver gameState={gameState} onPlayAgain={startGame} />
+        <ModalGameOver
+          gameState={gameState}
+          onPlayAgain={() => {
+            startGame();
+            scrollToGameBoard();
+          }}
+        />
       )}
     </div>
   );

@@ -118,7 +118,10 @@ export default function ModalGameOver({
           transition={{ delay: 0.4 }}
           whileHover={{ scale: 1.05 }}
           whileTap={{ scale: 0.95 }}
-          onClick={onPlayAgain}
+          onClick={() => {
+            onPlayAgain();
+            scrollToGameBoard();
+          }}
           className="w-full px-6 py-3 bg-indigo-600 text-white rounded-xl font-semibold text-lg hover:bg-indigo-700 transition-all duration-200 shadow-lg"
         >
           Play Again

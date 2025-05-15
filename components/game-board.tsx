@@ -19,6 +19,8 @@ interface GameBoardProps {
   onGameStart: () => void;
   onGameStop: () => void;
   isRunning: boolean;
+  gameBoardRef: React.RefObject<HTMLDivElement | null>;
+  scrollToGameBoard: () => void;
 }
 
 const GameBoard: React.FC<GameBoardProps> = ({
@@ -26,28 +28,17 @@ const GameBoard: React.FC<GameBoardProps> = ({
   onGameStart,
   onGameStop,
   isRunning,
+  gameBoardRef,
+  scrollToGameBoard,
 }) => {
   const { cellSize, gridSize, isMobile } = useGridSize();
-  const gameBoardRef = React.useRef<HTMLDivElement>(null);
   const { backgroundColor, gridColor } = useBeltColors(gameState.beltProgress);
 
   const adjustedCellSize = cellSize;
   const adjustedWidth = gridSize.width * cellSize;
   const adjustedHeight = gridSize.height * cellSize;
 
-  const scrollToGameBoard = () => {
-    window.scrollTo({
-      top: (gameBoardRef.current?.offsetTop ?? 0) - 40,
-      behavior: "smooth",
-    });
-  };
-
   const handleGameStart = () => {
-    onGameStart();
-    scrollToGameBoard();
-  };
-
-  const handlePlayAgain = () => {
     onGameStart();
     scrollToGameBoard();
   };
