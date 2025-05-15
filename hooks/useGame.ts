@@ -201,21 +201,13 @@ export const useGame = (selectedBeltIndex: number) => {
       }));
     }
 
-    console.log("현재 게임 상태:", {
-      snake: snake,
-      foods: foods,
-      combo: gameStateRef.current.combo,
-      comboTimeLeft: gameStateRef.current.comboTimeLeft,
-      lastMoveTime: lastMoveTimeRef.current,
-      currentTime: currentTime,
-    });
-
     switch (direction) {
       case "UP":
         head.y -= 1;
         break;
       case "DOWN":
         head.y += 1;
+
         break;
       case "LEFT":
         head.x -= 1;
@@ -258,7 +250,6 @@ export const useGame = (selectedBeltIndex: number) => {
     });
 
     if (ate) {
-      console.log("음식을 먹음! 현재 콤보:", gameStateRef.current.combo);
       const currentTime = Date.now();
       lastMoveTimeRef.current = currentTime;
       setLastMoveTime(currentTime);
@@ -267,7 +258,7 @@ export const useGame = (selectedBeltIndex: number) => {
 
       setGameState((prev) => {
         const newCombo = prev.combo + 1;
-        console.log("새로운 콤보:", newCombo);
+        // TODO: combo sound
         return {
           ...prev,
           combo: newCombo,

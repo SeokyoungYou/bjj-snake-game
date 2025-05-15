@@ -1,3 +1,4 @@
+import { ControlButtonDirection, Direction } from "@/types/game";
 import * as Tone from "tone";
 
 let backgroundMusicSequence: Tone.Pattern<string> | null = null;
@@ -146,6 +147,32 @@ const createSpecialItemSound = () => {
   synth.triggerAttackRelease("G5", "16n", now + 0.1);
   synth.triggerAttackRelease("C6", "16n", now + 0.2);
   synth.triggerAttackRelease("E6", "16n", now + 0.3);
+};
+
+// 키보드 클릭 소리
+const createControlKeySound = (change: "CHANGE" | "MAINTAIN") => {
+  const synth = new Tone.FMSynth({
+    oscillator: {
+      type: "pulse",
+    },
+    envelope: {
+      attack: 0.01,
+      decay: 0,
+      sustain: 0.1,
+      release: 0.1,
+    },
+  }).toDestination();
+
+  const now = Tone.now();
+
+  switch (change) {
+    case "CHANGE":
+      synth.triggerAttackRelease("C3", "32n", now);
+      break;
+    case "MAINTAIN":
+      synth.triggerAttackRelease("C2", "32n", now);
+  }
+  synth.volume.value = -8;
 };
 
 // 승급 소리
@@ -333,4 +360,5 @@ export const gameSounds = {
   },
   specialItem: createSpecialItemSound,
   promotion: createPromotionSound,
+  controlKey: createControlKeySound,
 };
