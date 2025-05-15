@@ -345,18 +345,19 @@ const stopBackgroundMusic = () => {
 };
 
 // 게임 효과음 객체
+// FIXME: sound muted when mutiple sound occurs
 export const gameSounds = {
   init: initTone,
   start: () => {
     createStartSound();
-    createBackgroundMusic();
+    // createBackgroundMusic();
   },
   createBackgroundMusic,
   stopBackgroundMusic,
   eat: createEatSound,
   gameOver: () => {
     createGameOverSound();
-    stopBackgroundMusic();
+    // stopBackgroundMusic();
   },
   specialItem: createSpecialItemSound,
   promotion: createPromotionSound,
