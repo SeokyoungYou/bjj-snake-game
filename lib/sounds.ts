@@ -199,10 +199,10 @@ const createBackgroundMusic = () => {
       type: "square",
     },
     envelope: {
-      attack: 0.01,
+      attack: 0.1,
       decay: 0.1,
-      sustain: 0.1,
-      release: 0.1,
+      sustain: 0.6,
+      release: 0.8,
     },
   }).toDestination();
 
@@ -214,7 +214,7 @@ const createBackgroundMusic = () => {
     envelope: {
       attack: 0.01,
       decay: 0.2,
-      sustain: 0.1,
+      sustain: 0.2,
       release: 0.2,
     },
   }).toDestination();
@@ -225,44 +225,40 @@ const createBackgroundMusic = () => {
       mainSynth.triggerAttackRelease(note, "8n", time);
     },
     [
-      // 첫 번째 구간: C 메이저 스케일
       "C4",
+      "C4",
+      "C4",
+      "D4",
       "E4",
-      "G4",
-      "C5",
-      "E5",
-      "G5",
-      "E5",
-      "C5",
-      // 두 번째 구간: G 메이저 스케일
-      "G4",
-      "B4",
-      "D5",
-      "G5",
-      "B5",
-      "D6",
-      "B5",
-      "G5",
-      // 세 번째 구간: A 마이너 스케일
-      "A4",
-      "C5",
-      "E5",
-      "A5",
-      "C6",
-      "E6",
-      "C6",
-      "A5",
-      // 네 번째 구간: F 메이저 스케일
+      "E4",
+      "E4",
+      "E4",
+      "E4",
+      "D4",
+      "E4",
       "F4",
-      "A4",
+      "G4",
+      "G4",
+      "G4",
+      "G4",
+      "G4",
+      "G4",
+      "G4",
+      "F4",
+      "E4",
+      "E4",
+      "E4",
+      "E4",
+      "E4",
+      "E4",
+      "E4",
+      "D4",
+      "C4",
+      "C4",
       "C5",
-      "F5",
-      "A5",
-      "C6",
-      "A5",
-      "F5",
+      "C1",
     ],
-    "upDown"
+    "up"
   );
 
   // 베이스 라인 패턴 (더 다양한 진행)
@@ -272,32 +268,29 @@ const createBackgroundMusic = () => {
     },
     [
       // C 메이저 구간
+      "C3",
+      "G2",
+      "C3",
       "C2",
       "G2",
-      "C3",
+      "E1",
       "G2",
-      // G 메이저 구간
+      "G1",
+      "E2",
+      "C2",
+      "E2",
+      "E1",
       "G2",
-      "D3",
+      "E1",
       "G2",
-      "D3",
-      // A 마이너 구간
-      "A2",
-      "E3",
-      "A2",
-      "E3",
-      // F 메이저 구간
-      "F2",
-      "C3",
-      "F2",
-      "C3",
+      "G1",
     ],
     "upDown"
   );
 
   // 볼륨 조절
-  mainSynth.volume.value = -8;
-  bassSynth.volume.value = -12;
+  mainSynth.volume.value = -12;
+  bassSynth.volume.value = -4;
 
   // 패턴 시작
   mainPattern.start(0);

@@ -14,9 +14,9 @@ export default function page() {
           </span>
           <div className="flex gap-2">
             <Button
-              onClick={() => {
-                gameSounds.init();
-                gameSounds.stopBackgroundMusic();
+              onClick={async () => {
+                await gameSounds.init();
+                gameSounds.createBackgroundMusic();
               }}
             >
               Play
