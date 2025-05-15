@@ -1,4 +1,3 @@
-import { ControlButtonDirection, Direction } from "@/types/game";
 import * as Tone from "tone";
 
 let backgroundMusicSequence: Tone.Pattern<string> | null = null;

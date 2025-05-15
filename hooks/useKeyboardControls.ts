@@ -6,10 +6,6 @@ export const useKeyboardControls = (
   directionRef: React.MutableRefObject<Direction>,
   nextDirectionRef: React.MutableRefObject<Direction>
 ) => {
-  useEffect(() => {
-    gameSounds.init();
-  }, []);
-
   // TODO: refactor here
 
   useEffect(() => {
