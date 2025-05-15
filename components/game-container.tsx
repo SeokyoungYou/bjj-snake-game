@@ -35,10 +35,11 @@ export default function GameContainer() {
       <div className="flex items-center justify-center gap-2 px-4 py-3 bg-gray-100 rounded-xl text-xs shadow-lg">
         <span className="text-xs">⬅️⬆️⬇️➡️</span>
         <span className={cn(isMobile ? "hidden" : "block")}>
-          Use arrow keys to move the snake!
+          Use arrow keys to move the snake! Special items appear every 5 combos.
         </span>
         <span className={cn(isMobile ? "block" : "hidden")}>
-          Use the buttons below to move the snake!
+          Use the buttons below to move the snake! Special items appear every 5
+          combos.
         </span>
       </div>
 

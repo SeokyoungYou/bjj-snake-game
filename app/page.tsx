@@ -6,18 +6,14 @@ export default function Home() {
       <div className="max-w-5xl w-full">
         <h1 className="text-3xl font-bold text-center mb-6">BJJ Snake Game</h1>
         <p className="text-gray-700 text-center mb-8">
-          Progress from White Belt to Black Belt. Eat food and get special items
-          to level up your belt!
+          Progress from White to Black Belt. Eat food and get special items to
+          level up your belt!
         </p>
 
         <GameContainer />
 
         <footer className="mt-12 text-center text-sm text-gray-500">
-          <p>
-            Use arrow keys to control the snake. Special items appear every 5
-            combos.
-          </p>
-          <p className="mt-1">© 2025 BJJ Snake Game</p>
+          <p className="mt-1">© 2025 Post Black Belt</p>
         </footer>
       </div>
     </main>
