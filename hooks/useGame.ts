@@ -163,6 +163,7 @@ export const useGame = (selectedBeltIndex: number) => {
       gameLoopRef.current = null;
     }
     setIsRunning(false);
+
     isRunningRef.current = false;
     unlockScroll();
   };
