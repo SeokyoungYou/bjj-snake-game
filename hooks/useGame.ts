@@ -520,7 +520,9 @@ export const useGame = (selectedBeltIndex: number) => {
 
   const updateScore = (points: number) => {
     setGameState((prev) => {
-      const newScore = prev.score + points;
+      // Apply score multiplier if special effect is active
+      const multiplier = prev.activeSpecialEffect ? 2 : 1;
+      const newScore = prev.score + points * multiplier;
       const { rank, degree } = calculateBeltProgress(
         newScore,
         prev.beltProgress.rank

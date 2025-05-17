@@ -352,14 +352,14 @@ export const gameSounds = {
   start: async () => {
     await initTone();
     createStartSound();
-    createBackgroundMusic();
+    // createBackgroundMusic();
   },
   createBackgroundMusic,
   stopBackgroundMusic,
   eat: createEatSound,
   gameOver: () => {
     createGameOverSound();
-    stopBackgroundMusic();
+    // stopBackgroundMusic();
   },
   specialItem: createSpecialItemSound,
   promotion: createPromotionSound,
