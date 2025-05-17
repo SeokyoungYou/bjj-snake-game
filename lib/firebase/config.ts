@@ -1,5 +1,5 @@
 import { initializeApp, getApps } from "firebase/app";
-import { getAnalytics } from "firebase/analytics";
+import { getAnalytics, isSupported } from "firebase/analytics";
 
 const firebaseConfig = {
   apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
@@ -15,7 +15,14 @@ const firebaseConfig = {
 const app =
   getApps().length === 0 ? initializeApp(firebaseConfig) : getApps()[0];
 
-// Analytics는 클라이언트 사이드에서만 초기화
-const analytics = typeof window !== "undefined" ? getAnalytics(app) : null;
+// Analytics 초기화 (클라이언트 사이드에서만)
+let analytics = null;
+if (typeof window !== "undefined") {
+  isSupported().then((yes) => {
+    if (yes) {
+      analytics = getAnalytics(app);
+    }
+  });
+}
 
 export { app, analytics };
