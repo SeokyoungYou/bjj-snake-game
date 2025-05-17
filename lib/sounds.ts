@@ -6,19 +6,26 @@ let bassPattern: Tone.Pattern<string> | null = null;
 let harmonyPattern: Tone.Pattern<string> | null = null;
 let drumPattern: Tone.Pattern<string> | null = null;
 
+// 오디오 컨텍스트 상태 관리
+let isAudioContextInitialized = false;
+
 // Tone.js 초기화
 const initTone = async () => {
   try {
-    await Tone.start();
-    Tone.Transport.start();
-    console.log("Tone.js initialized successfully");
+    if (!isAudioContextInitialized) {
+      await Tone.start();
+      await Tone.loaded();
+      Tone.Transport.start();
+      isAudioContextInitialized = true;
+      console.log("Tone.js initialized successfully");
+    }
   } catch (error) {
     console.error("Failed to initialize Tone.js:", error);
   }
 };
 
-// 게임 시작 소리
-const createStartSound = () => {
+// 사운드 생성 헬퍼 함수
+const createSynth = (options: Partial<Tone.FMSynthOptions> = {}) => {
   const synth = new Tone.FMSynth({
     harmonicity: 3.01,
     modulationIndex: 14,
@@ -40,14 +47,27 @@ const createStartSound = () => {
       sustain: 0.2,
       release: 0.1,
     },
+    ...options,
   }).toDestination();
 
+  // 볼륨 제한 설정
+  synth.volume.value = -10;
+  return synth;
+};
+
+// 게임 시작 소리
+const createStartSound = () => {
+  const synth = createSynth();
   const now = Tone.now();
-  // 현대적인 시작 멜로디
-  synth.triggerAttackRelease("C5", "16n", now);
-  synth.triggerAttackRelease("E5", "16n", now + 0.1);
-  synth.triggerAttackRelease("G5", "16n", now + 0.2);
-  synth.triggerAttackRelease("C6", "8n", now + 0.3);
+
+  try {
+    synth.triggerAttackRelease("C5", "16n", now);
+    synth.triggerAttackRelease("E5", "16n", now + 0.1);
+    synth.triggerAttackRelease("G5", "16n", now + 0.2);
+    synth.triggerAttackRelease("C6", "8n", now + 0.3);
+  } catch (error) {
+    console.error("Error playing start sound:", error);
+  }
 };
 
 // 먹이 먹기 소리
@@ -218,128 +238,110 @@ const createBackgroundMusic = () => {
     return;
   }
 
-  // 메인 멜로디를 위한 신스
-  const mainSynth = new Tone.Synth({
-    oscillator: {
-      type: "square",
-    },
-    envelope: {
-      attack: 0.1,
-      decay: 0.1,
-      sustain: 0.6,
-      release: 0.8,
-    },
-  }).toDestination();
+  try {
+    // 메인 멜로디를 위한 신스
+    const mainSynth = new Tone.Synth({
+      oscillator: {
+        type: "square",
+      },
+      envelope: {
+        attack: 0.1,
+        decay: 0.1,
+        sustain: 0.6,
+        release: 0.8,
+      },
+    }).toDestination();
 
-  // 베이스 라인을 위한 신스
-  const bassSynth = new Tone.Synth({
-    oscillator: {
-      type: "triangle",
-    },
-    envelope: {
-      attack: 0.01,
-      decay: 0.2,
-      sustain: 0.2,
-      release: 0.2,
-    },
-  }).toDestination();
+    // 베이스 라인을 위한 신스
+    const bassSynth = new Tone.Synth({
+      oscillator: {
+        type: "triangle",
+      },
+      envelope: {
+        attack: 0.01,
+        decay: 0.2,
+        sustain: 0.2,
+        release: 0.2,
+      },
+    }).toDestination();
 
-  // 메인 멜로디 패턴 (더 다양한 패턴)
-  mainPattern = new Tone.Pattern(
-    (time, note) => {
-      mainSynth.triggerAttackRelease(note, "8n", time);
-    },
-    [
-      "C4",
-      "C4",
-      "C4",
-      "D4",
-      "E4",
-      "E4",
-      "E4",
-      "E4",
-      "E4",
-      "D4",
-      "E4",
-      "F4",
-      "G4",
-      "G4",
-      "G4",
-      "G4",
-      "G4",
-      "G4",
-      "G4",
-      "F4",
-      "E4",
-      "E4",
-      "E4",
-      "E4",
-      "E4",
-      "E4",
-      "E4",
-      "D4",
-      "C4",
-      "C4",
-      "C5",
-      "C1",
-    ],
-    "up"
-  );
+    // 볼륨 조절
+    mainSynth.volume.value = -15;
+    bassSynth.volume.value = -8;
 
-  // 베이스 라인 패턴 (더 다양한 진행)
-  bassPattern = new Tone.Pattern(
-    (time, note) => {
-      bassSynth.triggerAttackRelease(note, "4n", time);
-    },
-    [
-      // C 메이저 구간
-      "C3",
-      "G2",
-      "C3",
-      "C2",
-      "G2",
-      "E1",
-      "G2",
-      "G1",
-      "E2",
-      "C2",
-      "E2",
-      "E1",
-      "G2",
-      "E1",
-      "G2",
-      "G1",
-    ],
-    "upDown"
-  );
+    // 메인 멜로디 패턴
+    mainPattern = new Tone.Pattern(
+      (time, note) => {
+        try {
+          mainSynth.triggerAttackRelease(note, "8n", time);
+        } catch (error) {
+          console.error("Error in main pattern:", error);
+        }
+      },
+      [
+        "C4",
+        "C4",
+        "C4",
+        "D4",
+        "E4",
+        "E4",
+        "E4",
+        "E4",
+        "E4",
+        "D4",
+        "E4",
+        "F4",
+        "G4",
+        "G4",
+        "G4",
+        "G4",
+      ],
+      "up"
+    );
 
-  // 볼륨 조절
-  mainSynth.volume.value = -12;
-  bassSynth.volume.value = -4;
+    // 베이스 라인 패턴
+    bassPattern = new Tone.Pattern(
+      (time, note) => {
+        try {
+          bassSynth.triggerAttackRelease(note, "4n", time);
+        } catch (error) {
+          console.error("Error in bass pattern:", error);
+        }
+      },
+      ["C3", "G2", "C3", "C2", "G2", "E1", "G2", "G1"],
+      "upDown"
+    );
 
-  // 패턴 시작
-  mainPattern.start(0);
-  bassPattern.start(0);
-  backgroundMusicSequence = mainPattern;
+    // 패턴 시작
+    mainPattern.start(0);
+    bassPattern.start(0);
+    backgroundMusicSequence = mainPattern;
+  } catch (error) {
+    console.error("Error creating background music:", error);
+    stopBackgroundMusic();
+  }
 };
 
 // 배경 음악 중지
 const stopBackgroundMusic = () => {
-  // 모든 패턴 중지 및 정리
-  if (mainPattern) {
-    mainPattern.stop();
-    mainPattern.dispose();
-    mainPattern = null;
-  }
-  if (bassPattern) {
-    bassPattern.stop();
-    bassPattern.dispose();
-    bassPattern = null;
-  }
-  if (backgroundMusicSequence) {
-    backgroundMusicSequence.stop();
-    backgroundMusicSequence.dispose();
-    backgroundMusicSequence = null;
+  try {
+    if (mainPattern) {
+      mainPattern.stop();
+      mainPattern.dispose();
+      mainPattern = null;
+    }
+    if (bassPattern) {
+      bassPattern.stop();
+      bassPattern.dispose();
+      bassPattern = null;
+    }
+    if (backgroundMusicSequence) {
+      backgroundMusicSequence.stop();
+      backgroundMusicSequence.dispose();
+      backgroundMusicSequence = null;
+    }
+  } catch (error) {
+    console.error("Error stopping background music:", error);
   }
 };
 
@@ -347,7 +349,8 @@ const stopBackgroundMusic = () => {
 // FIXME: sound muted when mutiple sound occurs
 export const gameSounds = {
   init: initTone,
-  start: () => {
+  start: async () => {
+    await initTone();
     createStartSound();
     createBackgroundMusic();
   },
