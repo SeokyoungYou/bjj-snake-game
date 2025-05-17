@@ -16,7 +16,7 @@ const getAppStoreLink = () => {
   if (/iphone|ipad|ipod/.test(userAgent)) {
     return "https://apps.apple.com/us/app/post-black-belt-bjj-journal/id1673061463";
   } else if (/android/.test(userAgent)) {
-    return "https://play.google.com/store/apps/details?id=com.quartz.postblackbeltd";
+    return "https://play.google.com/store/apps/details?id=com.quartz.postblackbelt";
   } else {
     return "https://post-black-belt.quartz.best";
   }
@@ -79,7 +79,7 @@ export function GameOverActions({ gameState }: GameOverActionsProps) {
         className="flex-1 px-4 py-2 bg-gray-100 text-gray-700 rounded-xl font-medium text-sm hover:bg-gray-200 transition-all duration-200 flex items-center justify-center gap-2"
       >
         <Download size={16} />
-        Download App
+        Download
       </motion.button>
     </div>
   );

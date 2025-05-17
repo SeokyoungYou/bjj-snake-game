@@ -34,7 +34,7 @@ export default function ModalGameOver({
           duration: 0.5,
           bounce: 0.4,
         }}
-        className="bg-indigo-50 p-8 rounded-2xl text-center shadow-2xl border border-gray-100 max-w-md w-full mx-4"
+        className="bg-indigo-50 py-8 px-4 rounded-2xl text-center shadow-2xl border border-gray-100 max-w-md w-full mx-4"
       >
         <motion.div
           initial={{ scale: 0 }}
