@@ -23,7 +23,6 @@ export default function ControlButton({
       variant="outline"
       className="w-[52px] h-[52px] rounded-lg bg-white/90 shadow active:bg-indigo-100 transition duration-200"
       onTouchStart={() => handleButtonPress(direction)}
-      onClick={() => handleButtonPress(direction)}
     >
       {direction === ControlButtonDirection.ArrowUp && (
         <ChevronUp className="w-7 h-7" />
