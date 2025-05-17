@@ -3,7 +3,6 @@
 import { useEffect, useRef } from "react";
 import { BELTS } from "@/constants/game-constants";
 import { BeltProgress } from "@/types/game";
-import { toast } from "sonner";
 
 /**
  * 벨트 프로그레스 바 컴포넌트
@@ -23,43 +22,6 @@ export default function BeltProgressBar({
   const currentDegree = beltProgress.degree;
   const prevBeltRef = useRef(currentBelt);
   const prevDegreeRef = useRef(currentDegree);
-
-  useEffect(() => {
-    // 벨트 변경 감지 (승급)
-    if (prevBeltRef.current !== currentBelt) {
-      toast.success(
-        `Congratulations! You've been promoted to ${BELTS[
-          currentBelt
-        ].name.toUpperCase()} Belt! 🎉`,
-        {
-          duration: 3000,
-          position: "top-center",
-          style: {
-            background: "linear-gradient(to right, #fbbf24, #fcd34d, #fbbf24)",
-            color: "#000",
-            fontWeight: "bold",
-            fontSize: "1.1rem",
-          },
-        }
-      );
-    }
-    // Grau 변경 감지 (단계 상승)
-    else if (prevDegreeRef.current < currentDegree) {
-      toast.success(`Advanced to ${currentDegree} Grau!`, {
-        duration: 2000,
-        position: "top-center",
-        style: {
-          background: "#4ade80",
-          color: "#fff",
-          fontWeight: "medium",
-          fontSize: "1rem",
-        },
-      });
-    }
-
-    prevBeltRef.current = currentBelt;
-    prevDegreeRef.current = currentDegree;
-  }, [currentBelt, currentDegree]);
 
   return (
     <div className="w-full mb-4">

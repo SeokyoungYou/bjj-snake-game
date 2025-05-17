@@ -531,20 +531,6 @@ export const useGame = (selectedBeltIndex: number) => {
       if (rank !== prev.beltProgress.rank) {
         gameSounds.promotion();
         generateObstacles();
-        toast.success(
-          `Congratulations! You've been promoted to ${rank.toUpperCase()} Belt! 🎉`,
-          {
-            duration: 3000,
-            position: "top-center",
-            style: {
-              background:
-                "linear-gradient(to right, #fbbf24, #fcd34d, #fbbf24)",
-              color: "#000",
-              fontWeight: "bold",
-              fontSize: "1.1rem",
-            },
-          }
-        );
       }
 
       return {
