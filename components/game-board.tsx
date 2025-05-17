@@ -150,9 +150,7 @@ const GameBoard: React.FC<GameBoardProps> = ({
         {/* Score and combo display */}
         <div className="absolute -top-8 right-0 z-50 flex items-center gap-2">
           {gameState.activeSpecialEffect && (
-            <span className="ml-2 text-yellow-400 animate-bounce">
-              2x Score!
-            </span>
+            <span className="text-yellow-400 animate-bounce">2x Score!</span>
           )}
           <div className="backdrop-blur bg-black/20 px-2 py-0.5 rounded-xl shadow">
             <span className="text-white font-bold text-sm">

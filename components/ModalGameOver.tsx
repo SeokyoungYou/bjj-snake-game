@@ -5,6 +5,7 @@ import { cn } from "@/lib/utils";
 import { GameState } from "@/types/game";
 import { useBeltColors } from "@/hooks/use-belt-colors";
 import { getRandomQuotes } from "@/constants/quote";
+import { GameOverActions } from "./GameOverActions";
 
 interface ModalGameOverProps {
   gameState: GameState;
@@ -123,11 +124,12 @@ export default function ModalGameOver({
           onClick={() => {
             onPlayAgain();
           }}
-          className="w-full px-6 py-3 bg-indigo-600 text-white rounded-xl font-semibold text-lg hover:bg-indigo-700 transition-all duration-200 shadow-lg"
+          className="w-full px-6 py-3 bg-indigo-600 text-white rounded-xl font-semibold text-lg hover:bg-indigo-700 transition-all duration-200 shadow-lg mb-4"
         >
           Play Again
         </motion.button>
-        {/* <p className="text-xs text-gray-400 mt-3">{getRandomQuotes()}</p> */}
+
+        <GameOverActions gameState={gameState} />
       </motion.div>
     </motion.div>
   );
