@@ -8,13 +8,12 @@ interface SnakeProps {
   beltProgress: BeltProgress;
 }
 
+const EYE_SIZE = 3;
+
 const Snake: React.FC<SnakeProps> = ({ snake, cellSize, beltProgress }) => {
-  const { isMobile } = useViewportSize();
   const { snakeHeadColor, snakeBodyColor, eyeColor, stripeColor } =
     useBeltColors(beltProgress);
   const stripeCount = beltProgress.degree;
-
-  const eyeSize = isMobile ? 3 : 6;
 
   const getSegmentColor = (index: number) => {
     if (index === 0) return snakeHeadColor;
@@ -50,16 +49,16 @@ const Snake: React.FC<SnakeProps> = ({ snake, cellSize, beltProgress }) => {
                 className={`absolute top-1 left-1 rounded-full`}
                 style={{
                   backgroundColor: eyeColor,
-                  width: eyeSize,
-                  height: eyeSize,
+                  width: EYE_SIZE,
+                  height: EYE_SIZE,
                 }}
               />
               <div
                 className={`absolute top-1 right-1 rounded-full`}
                 style={{
                   backgroundColor: eyeColor,
-                  width: eyeSize,
-                  height: eyeSize,
+                  width: EYE_SIZE,
+                  height: EYE_SIZE,
                 }}
               />
             </div>

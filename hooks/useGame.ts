@@ -10,7 +10,6 @@ import {
 } from "@/types/game";
 import { BELTS, SPECIAL_ITEMS } from "@/constants/game-constants";
 import { calculateBeltProgress } from "@/lib/score-calculator";
-import { toast } from "sonner";
 import { useGridSize } from "./useGridSize";
 import { useScrollLock } from "./useScrollLock";
 import { gameSounds } from "@/lib/sounds";
@@ -146,7 +145,7 @@ export const useGame = (selectedBeltIndex: number) => {
       if (!isRunningRef.current) return;
 
       const deltaTime = timestamp - lastUpdateTime;
-      if (deltaTime > gameSpeed) {
+      if (deltaTime >= gameSpeed) {
         update();
         lastUpdateTime = timestamp;
       }
@@ -207,7 +206,6 @@ export const useGame = (selectedBeltIndex: number) => {
         break;
       case "DOWN":
         head.y += 1;
-
         break;
       case "LEFT":
         head.x -= 1;
@@ -258,12 +256,14 @@ export const useGame = (selectedBeltIndex: number) => {
 
       setGameState((prev) => {
         const newCombo = prev.combo + 1;
-        // TODO: combo sound
         return {
           ...prev,
           combo: newCombo,
           comboMessage: newCombo > 1 ? `Combo x${newCombo}` : "",
           comboTimeLeft: COMBO_TIME_LEFT,
+          foods: newFoods,
+          snake: newSnake,
+          direction: directionRef.current,
         };
       });
 
@@ -334,9 +334,14 @@ export const useGame = (selectedBeltIndex: number) => {
         gameStateRef.current.combo > 0 &&
         gameStateRef.current.combo % 5 === 0
       ) {
-        console.log("특수 아이템 생성 조건 충족!");
         spawnSpecialItem();
       }
+    } else {
+      setGameState((prev) => ({
+        ...prev,
+        snake: newSnake,
+        direction: directionRef.current,
+      }));
     }
 
     if (
@@ -354,13 +359,6 @@ export const useGame = (selectedBeltIndex: number) => {
     } else {
       updateScore(points);
     }
-
-    setGameState((prev) => ({
-      ...prev,
-      snake: newSnake,
-      foods: newFoods,
-      direction: directionRef.current,
-    }));
   };
 
   const checkCollision = (head: Position): boolean => {

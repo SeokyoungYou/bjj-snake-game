@@ -31,7 +31,7 @@ const GameBoard: React.FC<GameBoardProps> = ({
   gameBoardRef,
   scrollToGameBoard,
 }) => {
-  const { cellSize, gridSize, isMobile } = useGridSize();
+  const { cellSize, gridSize } = useGridSize();
   const { backgroundColor, gridColor } = useBeltColors(gameState.beltProgress);
 
   const adjustedCellSize = cellSize;

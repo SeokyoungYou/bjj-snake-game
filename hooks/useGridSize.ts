@@ -9,7 +9,6 @@ interface GridSize {
 interface UseGridSizeReturn {
   cellSize: number;
   gridSize: GridSize;
-  isMobile: boolean;
 }
 
 // 기본 게임 보드 설정값
@@ -18,26 +17,15 @@ const DEFAULT_GRID_WIDTH = 30;
 const DEFAULT_GRID_HEIGHT = 20;
 
 export const useGridSize = (): UseGridSizeReturn => {
-  const { isMobile } = useViewportSize();
-
   const { cellSize, gridSize } = useMemo(() => {
-    if (isMobile) {
-      return {
-        cellSize: Math.min(DEFAULT_CELL_SIZE, 15),
-        gridSize: {
-          width: Math.min(DEFAULT_GRID_WIDTH, 20),
-          height: Math.max(DEFAULT_GRID_HEIGHT, 25),
-        },
-      };
-    }
     return {
-      cellSize: DEFAULT_CELL_SIZE,
+      cellSize: Math.min(DEFAULT_CELL_SIZE, 15),
       gridSize: {
-        width: DEFAULT_GRID_WIDTH,
-        height: DEFAULT_GRID_HEIGHT,
+        width: Math.min(DEFAULT_GRID_WIDTH, 20),
+        height: Math.max(DEFAULT_GRID_HEIGHT, 25),
       },
     };
-  }, [isMobile]);
+  }, []);
 
-  return { cellSize, gridSize, isMobile };
+  return { cellSize, gridSize };
 };
