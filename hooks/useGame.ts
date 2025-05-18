@@ -6,86 +6,22 @@ import {
   GameState,
   SpecialItem,
   ObstaclePosition,
-  BeltProgress,
 } from "@/types/game";
 import { BELTS, SPECIAL_ITEMS } from "@/constants/game-constants";
 import { calculateBeltProgress } from "@/lib/score-calculator";
 import { useGridSize } from "./useGridSize";
 import { useScrollLock } from "./useScrollLock";
 import { gameSounds } from "@/lib/sounds";
-
-// Game constants
-const INITIAL_SPEED = 200;
-const SPEED_INCREASE_PER_BELT = 30;
-const COMBO_TIME_LEFT = 5;
-
-const getInitialGameState = (
-  selectedBeltIndex: number,
-  gridSize: { width: number; height: number }
-): GameState => {
-  const initialFoods = [];
-  const foodCount = 2 * Math.pow(2, selectedBeltIndex); // 2의 배수로 증가
-
-  for (let i = 0; i < foodCount; i++) {
-    let validPosition = false;
-    let newFood: Position | null = null;
-    let attempts = 0;
-    const maxAttempts = 50;
-
-    while (!validPosition && attempts < maxAttempts) {
-      attempts++;
-      newFood = {
-        x: Math.floor(Math.random() * gridSize.width),
-        y: Math.floor(Math.random() * gridSize.height),
-      };
-
-      validPosition = true;
-
-      // 다른 음식과 겹치는지 확인
-      for (let j = 0; j < initialFoods.length; j++) {
-        if (
-          newFood.x === initialFoods[j].x &&
-          newFood.y === initialFoods[j].y
-        ) {
-          validPosition = false;
-          break;
-        }
-      }
-    }
-
-    if (newFood && validPosition) {
-      initialFoods.push(newFood);
-    }
-  }
-
-  return {
-    snake: [
-      { x: Math.floor(gridSize.width / 2), y: Math.floor(gridSize.height / 2) },
-      {
-        x: Math.floor(gridSize.width / 2) - 1,
-        y: Math.floor(gridSize.height / 2),
-      },
-      {
-        x: Math.floor(gridSize.width / 2) - 2,
-        y: Math.floor(gridSize.height / 2),
-      },
-    ],
-    foods: initialFoods,
-    specialFood: null,
-    obstacles: [],
-    direction: "RIGHT",
-    isGameOver: false,
-    score: 0,
-    beltProgress: {
-      rank: BELTS[selectedBeltIndex].rank,
-      degree: 0,
-    },
-    activeSpecialEffect: null,
-    combo: 0,
-    comboTimeLeft: 0,
-    comboMessage: "",
-  };
-};
+import {
+  getInitialGameState,
+  checkCollision,
+  findSafeSpot,
+  isValidPosition,
+  calculateGameSpeed,
+  INITIAL_SPEED,
+  SPEED_INCREASE_PER_BELT,
+  COMBO_TIME_LEFT,
+} from "@/lib/game-utils";
 
 export const useGame = (selectedBeltIndex: number) => {
   const { gridSize } = useGridSize();
@@ -113,16 +49,13 @@ export const useGame = (selectedBeltIndex: number) => {
   }, [lastMoveTime]);
 
   useEffect(() => {
-    // 게임 시작 시 효과음 초기화
     gameSounds.init();
   }, []);
 
   const startGame = async () => {
     if (isRunningRef.current) return;
 
-    // 게임 시작 시 효과음 초기화
     await gameSounds.init();
-    // 게임 시작 소리 재생
     gameSounds.start();
 
     stopGame();
@@ -135,10 +68,7 @@ export const useGame = (selectedBeltIndex: number) => {
     setIsRunning(true);
     isRunningRef.current = true;
 
-    const gameSpeed =
-      INITIAL_SPEED -
-      Object.values(BeltRank).indexOf(BELTS[selectedBeltIndex].rank) *
-        SPEED_INCREASE_PER_BELT;
+    const gameSpeed = calculateGameSpeed(selectedBeltIndex);
     let lastUpdateTime = 0;
 
     const gameLoop = (timestamp: number) => {
@@ -162,7 +92,6 @@ export const useGame = (selectedBeltIndex: number) => {
       gameLoopRef.current = null;
     }
     setIsRunning(false);
-
     isRunningRef.current = false;
     unlockScroll();
   };
@@ -182,7 +111,6 @@ export const useGame = (selectedBeltIndex: number) => {
     const currentTime = Date.now();
     const timeDiff = currentTime - lastMoveTimeRef.current;
 
-    // 콤보 타임아웃 체크 및 업데이트
     if (timeDiff > 5000) {
       setGameState((prev) => ({
         ...prev,
@@ -217,9 +145,9 @@ export const useGame = (selectedBeltIndex: number) => {
 
     directionRef.current = nextDirectionRef.current;
 
-    if (checkCollision(head)) {
+    if (checkCollision(head, snake, obstacles, gridSize, activeSpecialEffect)) {
       if (activeSpecialEffect === "Escape") {
-        const safeSpot = findSafeSpot();
+        const safeSpot = findSafeSpot(snake, obstacles, gridSize);
         if (safeSpot) {
           head.x = safeSpot.x;
           head.y = safeSpot.y;
@@ -237,7 +165,6 @@ export const useGame = (selectedBeltIndex: number) => {
     let ate = false;
     let points = 0;
 
-    // foods 배열에서 먹이를 먹었는지 확인
     const newFoods = foods.filter((food) => {
       if (head.x === food.x && head.y === food.y) {
         ate = true;
@@ -267,7 +194,6 @@ export const useGame = (selectedBeltIndex: number) => {
         };
       });
 
-      // 새로운 음식 생성
       const currentBeltIndex = Object.values(BeltRank).indexOf(
         gameStateRef.current.beltProgress.rank
       );
@@ -286,43 +212,14 @@ export const useGame = (selectedBeltIndex: number) => {
             y: Math.floor(Math.random() * gridSize.height),
           };
 
-          validPosition = true;
-
-          // 뱀과 겹치는지 확인
-          for (let i = 0; i < newSnake.length; i++) {
-            if (newFood.x === newSnake[i].x && newFood.y === newSnake[i].y) {
-              validPosition = false;
-              break;
-            }
-          }
-
-          // 다른 음식과 겹치는지 확인
-          for (let i = 0; i < newFoods.length; i++) {
-            if (newFood.x === newFoods[i].x && newFood.y === newFoods[i].y) {
-              validPosition = false;
-              break;
-            }
-          }
-
-          // 장애물과 겹치는지 확인
-          for (let i = 0; i < obstacles.length; i++) {
-            if (
-              newFood.x === obstacles[i].position.x &&
-              newFood.y === obstacles[i].position.y
-            ) {
-              validPosition = false;
-              break;
-            }
-          }
-
-          // 특수 음식과 겹치는지 확인
-          if (
-            gameStateRef.current.specialFood &&
-            newFood.x === gameStateRef.current.specialFood.position.x &&
-            newFood.y === gameStateRef.current.specialFood.position.y
-          ) {
-            validPosition = false;
-          }
+          validPosition = isValidPosition(
+            newFood,
+            newSnake,
+            newFoods,
+            obstacles,
+            gameStateRef.current.specialFood,
+            gridSize
+          );
         }
 
         if (newFood && validPosition) {
@@ -361,106 +258,6 @@ export const useGame = (selectedBeltIndex: number) => {
     }
   };
 
-  const checkCollision = (head: Position): boolean => {
-    const { snake, obstacles } = gameStateRef.current;
-
-    if (
-      head.x < 0 ||
-      head.x >= gridSize.width ||
-      head.y < 0 ||
-      head.y >= gridSize.height
-    ) {
-      return true;
-    }
-
-    for (let i = 1; i < snake.length; i++) {
-      if (head.x === snake[i].x && head.y === snake[i].y) {
-        return true;
-      }
-    }
-
-    if (gameStateRef.current.activeSpecialEffect !== "Defense") {
-      for (let i = 0; i < obstacles.length; i++) {
-        if (
-          head.x === obstacles[i].position.x &&
-          head.y === obstacles[i].position.y
-        ) {
-          return true;
-        }
-      }
-    }
-
-    return false;
-  };
-
-  const spawnFood = () => {
-    const { snake, foods, obstacles, specialFood } = gameStateRef.current;
-    const currentBeltIndex = Object.values(BeltRank).indexOf(
-      gameStateRef.current.beltProgress.rank
-    );
-    const targetFoodCount = 2 * Math.pow(2, currentBeltIndex);
-
-    if (foods.length < targetFoodCount) {
-      let newFood: Position | null = null;
-      let validPosition = false;
-      let attempts = 0;
-      const maxAttempts = 50;
-
-      while (!validPosition && attempts < maxAttempts) {
-        attempts++;
-        newFood = {
-          x: Math.floor(Math.random() * gridSize.width),
-          y: Math.floor(Math.random() * gridSize.height),
-        };
-
-        validPosition = true;
-
-        // 뱀과 겹치는지 확인
-        for (let i = 0; i < snake.length; i++) {
-          if (newFood.x === snake[i].x && newFood.y === snake[i].y) {
-            validPosition = false;
-            break;
-          }
-        }
-
-        // 다른 음식과 겹치는지 확인
-        for (let i = 0; i < foods.length; i++) {
-          if (newFood.x === foods[i].x && newFood.y === foods[i].y) {
-            validPosition = false;
-            break;
-          }
-        }
-
-        // 장애물과 겹치는지 확인
-        for (let i = 0; i < obstacles.length; i++) {
-          if (
-            newFood.x === obstacles[i].position.x &&
-            newFood.y === obstacles[i].position.y
-          ) {
-            validPosition = false;
-            break;
-          }
-        }
-
-        // 특수 음식과 겹치는지 확인
-        if (
-          specialFood &&
-          newFood.x === specialFood.position.x &&
-          newFood.y === specialFood.position.y
-        ) {
-          validPosition = false;
-        }
-      }
-
-      if (newFood && validPosition) {
-        setGameState((prev) => ({
-          ...prev,
-          foods: [...prev.foods, newFood],
-        }));
-      }
-    }
-  };
-
   const spawnSpecialItem = () => {
     const { snake, foods, obstacles, specialFood } = gameStateRef.current;
     if (specialFood) return;
@@ -477,31 +274,14 @@ export const useGame = (selectedBeltIndex: number) => {
       const type =
         SPECIAL_ITEMS[Math.floor(Math.random() * SPECIAL_ITEMS.length)];
       newItem = { position, type };
-      validPosition = true;
-
-      for (let i = 0; i < snake.length; i++) {
-        if (position.x === snake[i].x && position.y === snake[i].y) {
-          validPosition = false;
-          break;
-        }
-      }
-
-      for (let i = 0; i < foods.length; i++) {
-        if (position.x === foods[i].x && position.y === foods[i].y) {
-          validPosition = false;
-          break;
-        }
-      }
-
-      for (let i = 0; i < obstacles.length; i++) {
-        if (
-          position.x === obstacles[i].position.x &&
-          position.y === obstacles[i].position.y
-        ) {
-          validPosition = false;
-          break;
-        }
-      }
+      validPosition = isValidPosition(
+        position,
+        snake,
+        foods,
+        obstacles,
+        specialFood,
+        gridSize
+      );
     }
 
     if (newItem) {
@@ -518,7 +298,6 @@ export const useGame = (selectedBeltIndex: number) => {
 
   const updateScore = (points: number) => {
     setGameState((prev) => {
-      // Apply score multiplier if special effect is active
       const multiplier = prev.activeSpecialEffect ? 2 : 1;
       const newScore = prev.score + points * multiplier;
       const { rank, degree } = calculateBeltProgress(
@@ -584,33 +363,14 @@ export const useGame = (selectedBeltIndex: number) => {
 
         if (!validPosition) continue;
 
-        if (
-          gameStateRef.current.foods.some(
-            (food) => position.x === food.x && position.y === food.y
-          )
-        ) {
-          validPosition = false;
-          continue;
-        }
-
-        if (
-          gameStateRef.current.specialFood &&
-          position.x === gameStateRef.current.specialFood.position.x &&
-          position.y === gameStateRef.current.specialFood.position.y
-        ) {
-          validPosition = false;
-          continue;
-        }
-
-        for (let j = 0; j < newObstacles.length; j++) {
-          if (
-            position.x === newObstacles[j].position.x &&
-            position.y === newObstacles[j].position.y
-          ) {
-            validPosition = false;
-            break;
-          }
-        }
+        validPosition = isValidPosition(
+          position,
+          gameStateRef.current.snake,
+          gameStateRef.current.foods,
+          newObstacles,
+          gameStateRef.current.specialFood,
+          gridSize
+        );
       }
 
       if (obstacle && validPosition) {
@@ -619,39 +379,6 @@ export const useGame = (selectedBeltIndex: number) => {
     }
 
     setGameState((prev) => ({ ...prev, obstacles: newObstacles }));
-  };
-
-  const findSafeSpot = (): Position | null => {
-    const { snake, obstacles } = gameStateRef.current;
-    const safeSpots: Position[] = [];
-
-    for (let x = 0; x < gridSize.width; x++) {
-      for (let y = 0; y < gridSize.height; y++) {
-        let isSafe = true;
-
-        for (let i = 0; i < snake.length; i++) {
-          if (x === snake[i].x && y === snake[i].y) {
-            isSafe = false;
-            break;
-          }
-        }
-
-        for (let i = 0; i < obstacles.length; i++) {
-          if (x === obstacles[i].position.x && y === obstacles[i].position.y) {
-            isSafe = false;
-            break;
-          }
-        }
-
-        if (isSafe) {
-          safeSpots.push({ x, y });
-        }
-      }
-    }
-
-    return safeSpots.length > 0
-      ? safeSpots[Math.floor(Math.random() * safeSpots.length)]
-      : null;
   };
 
   return {
